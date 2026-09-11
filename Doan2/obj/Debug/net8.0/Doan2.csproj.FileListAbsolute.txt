@@ -1,0 +1,9 @@
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.csproj.AssemblyReference.cache
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.AssemblyInfoInputs.cache
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.AssemblyInfo.cs
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.csproj.CoreCompileInputs.cache
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\ngoda\Source\Repos\iykyk\Doan2\obj\Debug\net8.0\Doan2.sourcelink.json
