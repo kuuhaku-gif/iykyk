@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Ký Tài Khoản - CineMax</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+
+  <!-- Logo đầu trang trỏ về trang chủ -->
+  <header class="auth-header">
+    <a href="Trangchu.html" class="logo">Cikipdy<span>Max</span></a>
+  </header>
+
+  <main class="auth-container">
+    <div class="auth-card">
+      <h2>Tạo Tài Khoản</h2>
+      <form class="auth-form" action="#" method="POST">
+        
+        <div class="form-group">
+          <label for="fullname">Họ và tên</label>
+          <input type="text" id="fullname" name="fullname" placeholder="Nguyễn Văn A" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Địa chỉ Email</label>
+          <input type="email" id="email" name="email" placeholder="example@email.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Số điện thoại</label>
+          <input type="tel" id="phone" name="phone" placeholder="0901 234 567" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-password">Xác nhận mật khẩu</label>
+          <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu" required>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" name="terms" required> Tôi đồng ý với điều khoản sử dụng
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary btn-full">Đăng Ký</button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
+        <p><a href="index.html" class="back-home">← Quay lại trang chủ</a></p>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

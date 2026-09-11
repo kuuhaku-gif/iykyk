@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tài Khoản Của Tôi - CiCikipdyMax</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo"><a href="index.html">Cikipdy<span>Max</span></a></div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Trang chủ</a></li>
+        <li><a href="index.html#movies">Phim đang chiếu</a></li>
+        <li><a href="index.html#prices">Giá vé</a></li>
+      </ul>
+    </nav>
+    <div class="user-menu">
+      <a href="profile.html" class="user-avatar-btn">
+        <img src="" alt="Avatar">
+        <span>Nguyễn Văn A</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Profile Layout -->
+  <main class="container profile-layout">
+    
+    <!-- Cột bên trái: Thẻ thông tin cá nhân -->
+    <aside class="profile-card">
+      <div class="profile-header">
+        <img src="" alt="Avatar" class="avatar-lg">
+        <h3>Nguyễn Văn A</h3>
+        <span class="badge">Thành Viên</span>
+      </div>
+
+      <div class="profile-details">
+        <div class="detail-row">
+          <span class="label">Email:</span>
+          <span class="value">vana@example.com</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Số điện thoại:</span>
+          <span class="value">0901 234 567</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Điểm tích luỹ:</span>
+          <span class="value highlight">450 C-Points</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Ngày tham gia:</span>
+          <span class="value">12/03/2025</span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="btn-secondary btn-full">Chỉnh Sửa Thông Tin</button>
+        <a href="login.html" class="logout-link">Đăng xuất</a>
+      </div>
+    </aside>
+
+    <!-- Cột bên phải: Lịch sử đặt vé & Hoạt động -->
+    <section class="profile-content">
+      <h2 class="section-title">Lịch Sử Mua Vé</h2>
+
+      <div class="ticket-list">
+        <!-- Vé 1 (Sắp chiếu) -->
+        <article class="ticket-item">
+          <div class="ticket-status upcoming">Sắp Chiếu</div>
+          <div class="ticket-main">
+            <h3>Vũ Trụ Vô Tận: Khởi Nguyên</h3>
+            <p class="ticket-info">Rạp: <strong>CineMax Quận 1 - Rạp 03 (IMAX)</strong></p>
+            <p class="ticket-info">Suất chiếu: <strong>19:30 - Thứ Bảy, 12/09/2026</strong></p>
+            <p class="ticket-info">Ghế: <span class="seat-badge">H12</span> <span class="seat-badge">H13</span> (2 Vé VIP)</p>
+          </div>
+          <div class="ticket-side">
+            <div class="ticket-price">220.000 đ</div>
+            <button class="btn-ticket">Mã Vé: #CNM9841</button>
+          </div>
+        </article>
+
+        <!-- Vé 2 (Đã hoàn thành) -->
+        <article class="ticket-item">
+          <div class="ticket-status completed">Đã Xem</div>
+          <div class="ticket-main">
+            <h3>Bóng Đêm Thức Tỉnh</h3>
+            <p class="ticket-info">Rạp: <strong>CineMax Quận 1 - Rạp 01 (2D)</strong></p>
+            <p class="ticket-info">Suất chiếu: <strong>20:00 - Thứ Sáu, 28/08/2026</strong></p>
+            <p class="ticket-info">Ghế: <span class="seat-badge">F08</span> (1 Vé Thường)</p>
+          </div>
+          <div class="ticket-side">
+            <div class="ticket-price">90.000 đ</div>
+            <span class="ticket-code">Mã: #CNM8721</span>
+          </div>
+        </article>
+
+        <!-- Vé 3 (Đã hoàn thành) -->
+        <article class="ticket-item">
+          <div class="ticket-status completed">Đã Xem</div>
+          <div class="ticket-main">
+            <h3>Hành Trình Kỳ Ảo</h3>
+            <p class="ticket-info">Rạp: <strong>CineMax Gò Vấp - Rạp 05 (3D)</strong></p>
+            <p class="ticket-info">Suất chiếu: <strong>15:00 - Chủ Nhật, 10/08/2026</strong></p>
+            <p class="ticket-info">Ghế: <span class="seat-badge">D04</span> <span class="seat-badge">D05</span> (2 Vé VIP)</p>
+          </div>
+          <div class="ticket-side">
+            <div class="ticket-price">220.000 đ</div>
+            <span class="ticket-code">Mã: #CNM7320</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      <p>&copy; 2026 CiCikipdyMax. Mọi quyền được bảo lưu.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
