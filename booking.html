@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMax - Đặt Vé Xem Phim</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo"><a href="index.html">Cine<span>Max</span></a></div>
+    <nav class="nav-links">
+      <a href="index.html">Trang Chủ</a>
+      <a href="index.html#movies">Phim Đang Chiếu</a>
+      <a href="profile.html">Vé Của Tôi</a>
+    </nav>
+    <div class="header-auth">
+      <a href="profile.html" class="user-greeting">👤 Nguyễn Văn A</a>
+    </div>
+  </header>
+
+  <!-- Main Booking Container -->
+  <div class="booking-container">
+    
+    <!-- Cột bên trái: Chọn suất chiếu & Sơ đồ ghế -->
+    <div class="seat-selection-section">
+      
+      <!-- Bộ lọc suất chiếu -->
+      <div class="booking-filter">
+        <h3>1. Chọn Suất Chiếu</h3>
+        <div class="filter-group">
+          <label>Ngày chiếu:</label>
+          <div class="date-chips">
+            <button class="chip active">Hôm nay (25/09)</button>
+            <button class="chip">Thứ Bảy (26/09)</button>
+            <button class="chip">Chủ Nhật (27/09)</button>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>Khung giờ & Phòng chiếu:</label>
+          <div class="time-chips">
+            <button class="chip active">18:30 (Rạp 01 - 2D)</button>
+            <button class="chip">20:15 (Rạp 03 - IMAX)</button>
+            <button class="chip">22:00 (Rạp 02 - 3D)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khu vực màn hình & ghế -->
+      <div class="cinema-room">
+        <h3>2. Chọn Ghế Ngồi</h3>
+        
+        <!-- Màn hình chiếu -->
+        <div class="screen-container">
+          <div class="screen"></div>
+          <p class="screen-label">MÀN HÌNH</p>
+        </div>
+
+        <!-- Sơ đồ ghế -->
+        <div class="seat-grid" id="seatGrid">
+          <!-- Dãy A (Ghế thường) -->
+          <div class="seat-row">
+            <span class="row-label">A</span>
+            <div class="seat standard" data-seat="A1" data-price="90000">1</div>
+            <div class="seat standard" data-seat="A2" data-price="90000">2</div>
+            <div class="seat standard occupied" data-seat="A3">3</div>
+            <div class="seat standard occupied" data-seat="A4">4</div>
+            <div class="seat standard" data-seat="A5" data-price="90000">5</div>
+            <div class="seat standard" data-seat="A6" data-price="90000">6</div>
+          </div>
+
+          <!-- Dãy B (Ghế thường) -->
+          <div class="seat-row">
+            <span class="row-label">B</span>
+            <div class="seat standard" data-seat="B1" data-price="90000">1</div>
+            <div class="seat standard" data-seat="B2" data-price="90000">2</div>
+            <div class="seat standard" data-seat="B3" data-price="90000">3</div>
+            <div class="seat standard" data-seat="B4" data-price="90000">4</div>
+            <div class="seat standard" data-seat="B5" data-price="90000">5</div>
+            <div class="seat standard" data-seat="B6" data-price="90000">6</div>
+          </div>
+
+          <!-- Dãy C (Ghế VIP) -->
+          <div class="seat-row">
+            <span class="row-label">C</span>
+            <div class="seat vip" data-seat="C1" data-price="120000">1</div>
+            <div class="seat vip" data-seat="C2" data-price="120000">2</div>
+            <div class="seat vip occupied" data-seat="C3">3</div>
+            <div class="seat vip" data-seat="C4" data-price="120000">4</div>
+            <div class="seat vip" data-seat="C5" data-price="120000">5</div>
+            <div class="seat vip" data-seat="C6" data-price="120000">6</div>
+          </div>
+
+          <!-- Dãy D (Ghế VIP) -->
+          <div class="seat-row">
+            <span class="row-label">D</span>
+            <div class="seat vip" data-seat="D1" data-price="120000">1</div>
+            <div class="seat vip" data-seat="D2" data-price="120000">2</div>
+            <div class="seat vip" data-seat="D3" data-price="120000">3</div>
+            <div class="seat vip" data-seat="D4" data-price="120000">4</div>
+            <div class="seat vip" data-seat="D5" data-price="120000">5</div>
+            <div class="seat vip" data-seat="D6" data-price="120000">6</div>
+          </div>
+        </div>
+
+        <!-- Chú thích loại ghế -->
+        <div class="seat-legend">
+          <div class="legend-item"><span class="seat-sample standard"></span> Ghế Thường (90k)</div>
+          <div class="legend-item"><span class="seat-sample vip"></span> Ghế VIP (120k)</div>
+          <div class="legend-item"><span class="seat-sample selected"></span> Ghế Đang Chọn</div>
+          <div class="legend-item"><span class="seat-sample occupied"></span> Đã Có Người</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cột bên phải: Tóm tắt vé & Thanh toán -->
+    <aside class="booking-summary-sidebar">
+      <div class="summary-card">
+        <h3>Thông Tin Đặt Vé</h3>
+        
+        <div class="movie-brief">
+          <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&auto=format&fit=crop" class="movie-poster-sm" alt="Poster">
+          <div>
+            <h4 id="summaryTitle">Vũ Trụ Vô Tận: Khởi Nguyên</h4>
+            <p class="text-muted">Hành động, Giả tưởng</p>
+            <p class="text-muted">135 phút</p>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="summary-details">
+          <p><strong>Rạp:</strong> CineMax Quận 1 - Rạp 03 (IMAX)</p>
+          <p><strong>Suất:</strong> 20:15 - Thứ Sáu, 25/09/2026</p>
+          <p><strong>Ghế đã chọn:</strong> <span id="selectedSeatsList" class="highlight-text">Chưa chọn</span></p>
+        </div>
+
+        <hr class="divider">
+
+        <div class="summary-total">
+          <span>Tổng tiền:</span>
+          <span class="total-price" id="totalPrice">0 đ</span>
+        </div>
+
+        <button class="btn-primary btn-full mt-20" id="btnConfirmBooking">Xác Nhận Thanh Toán</button>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Script xử lý chọn ghế và tính tiền tự động -->
+  <script>
+    const seatGrid = document.getElementById('seatGrid');
+    const selectedSeatsList = document.getElementById('selectedSeatsList');
+    const totalPriceEl = document.getElementById('totalPrice');
+    const btnConfirm = document.getElementById('btnConfirmBooking');
+
+    let selectedSeats = [];
+
+    seatGrid.addEventListener('click', (e) => {
+      const target = e.target;
+      // Chỉ nhận click vào ghế chưa bị đặt
+      if (target.classList.contains('seat') && !target.classList.contains('occupied')) {
+        const seatCode = target.getAttribute('data-seat');
+        const price = parseInt(target.getAttribute('data-price'));
+
+        target.classList.toggle('selected');
+
+        if (target.classList.contains('selected')) {
+          selectedSeats.push({ code: seatCode, price: price });
+        } else {
+          selectedSeats = selectedSeats.filter(s => s.code !== seatCode);
+        }
+
+        updateSummary();
+      }
+    });
+
+    function updateSummary() {
+      if (selectedSeats.length === 0) {
+        selectedSeatsList.innerText = "Chưa chọn";
+        totalPriceEl.innerText = "0 đ";
+        return;
+      }
+
+      const seatCodes = selectedSeats.map(s => s.code).join(', ');
+      const total = selectedSeats.reduce((sum, s) => sum + s.price, 0);
+
+      selectedSeatsList.innerText = seatCodes;
+      totalPriceEl.innerText = total.toLocaleString('vi-VN') + " đ";
+    }
+
+    btnConfirm.addEventListener('click', () => {
+      if (selectedSeats.length === 0) {
+        alert("Vui lòng chọn ít nhất một ghế ngồi!");
+        return;
+      }
+
+      // 1. Gom dữ liệu đặt vé tạm thời
+      const bookingData = {
+        movieTitle: document.getElementById('summaryTitle').innerText,
+        cinemaRoom: "CineMax Quận 1 - Rạp 03 (IMAX)",
+        showtime: "20:15 - Thứ Sáu, 25/09/2026",
+        seats: selectedSeats.map(s => s.code).join(', '),
+        totalPrice: selectedSeats.reduce((sum, s) => sum + s.price, 0)
+      };
+
+      // 2. Lưu vào sessionStorage để trang payment.html đọc được
+      sessionStorage.setItem('currentBooking', JSON.stringify(bookingData));
+
+      // 3. Chuyển sang trang thanh toán
+      window.location.href = "payment.html";
+    });
+  </script>
+</body>
+</html>
