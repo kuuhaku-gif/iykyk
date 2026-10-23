@@ -29,7 +29,7 @@
   <section class="hero" id="home">
     <div class="hero-content">
       <span class="badge">Phim Hot Tuần Này</span>
-      <h1>Vũ Trụ Vô Tận Spiderman: Khởi Nguyên</h1>
+      <h1>Trải Nghiệm Rạp Chiếu Phim Đỉnh Cao</h1>
       <p>Trải nghiệm công nghệ âm thanh vòm Dolby Atmos và màn hình IMAX sắc nét từng khung hình.</p>
       <div class="hero-actions">
         <a href="#movies" class="btn-primary">Mua Vé</a>
@@ -42,44 +42,44 @@
   <section class="container" id="movies">
     <h2 class="section-title">Phim Đang Chiếu</h2>
 
-    <div class="movie-grid">
+    <div class="movie-grid" id="movieGrid">
       <!-- Phim 1 -->
       <article class="movie-card">
-        <img src="" alt="Poster Phim 1">
+        <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&auto=format&fit=crop" alt="Poster Phim 1">
         <div class="movie-info">
-          <h3>12 Người Đàn Ông Tức Giận</h3>
-          <p class="movie-meta">Hành động, Giả tưởng • 120 phút</p>
-          <button class="btn-book">Đặt vé</button>
+          <h3>Vũ Trụ Vô Tận: Khởi Nguyên</h3>
+          <p class="movie-meta">Hành động, Giả tưởng • 135 phút</p>
+          <a href="booking.html?movieId=1" class="btn-book">Đặt vé</a>
         </div>
       </article>
 
       <!-- Phim 2 -->
       <article class="movie-card">
-        <img src="" alt="Poster Phim 2">
+        <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop" alt="Poster Phim 2">
         <div class="movie-info">
-          <h3>Hành Trình Đi Vào Lòng Đất</h3>
-          <p class="movie-meta">Hoạt hình, Phiêu lưu • 95 phút</p>
-          <button class="btn-book">Đặt vé</button>
+          <h3>Bóng Đêm Thức Tỉnh</h3>
+          <p class="movie-meta">Hành động, Phiêu lưu • 120 phút</p>
+          <a href="booking.html?movieId=2" class="btn-book">Đặt vé</a>
         </div>
       </article>
 
       <!-- Phim 3 -->
       <article class="movie-card">
-        <img src="" alt="Poster Phim 3">
+        <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&auto=format&fit=crop" alt="Poster Phim 3">
         <div class="movie-info">
-          <h3>Scary Movie 67</h3>
-          <p class="movie-meta">Kinh dị, Hồi hộp • 110 phút</p>
-          <button class="btn-book">Đặt vé</button>
+          <h3>Hành Trình Kỳ Ảo</h3>
+          <p class="movie-meta">Hoạt hình, Gia đình • 95 phút</p>
+          <a href="booking.html?movieId=3" class="btn-book">Đặt vé</a>
         </div>
       </article>
 
       <!-- Phim 4 -->
       <article class="movie-card">
-        <img src="" alt="Poster Phim 4">
+        <img src="https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=400&auto=format&fit=crop" alt="Poster Phim 4">
         <div class="movie-info">
           <h3>La La Land</h3>
           <p class="movie-meta">Tình cảm, Tâm lý • 105 phút</p>
-          <button class="btn-book">Đặt vé</button>
+          <a href="booking.html?movieId=4" class="btn-book">Đặt vé</a>
         </div>
       </article>
     </div>
@@ -137,5 +137,34 @@
     </div>
   </footer>
 
+  <!-- Kết nối API & Cập nhật trạng thái đăng nhập -->
+  <script src="api.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const res = await apiGetMovies();
+        if (res.ok && res.data && res.data.data && res.data.data.length > 0) {
+          const grid = document.getElementById("movieGrid");
+          grid.innerHTML = "";
+          res.data.data.forEach(m => {
+            const poster = m.poster || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400&auto=format&fit=crop";
+            const card = document.createElement("article");
+            card.className = "movie-card";
+            card.innerHTML = `
+              <img src="${poster}" alt="${m.title}">
+              <div class="movie-info">
+                <h3>${m.title}</h3>
+                <p class="movie-meta">${m.category || 'Phim Chiếu Rạp'} • ${m.duration || 120} phút</p>
+                <a href="booking.html?movieId=${m.movieId}" class="btn-book">Đặt vé</a>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+        }
+      } catch (err) {
+        console.warn("Dùng danh sách phim mặc định trên Trang chủ:", err);
+      }
+    });
+  </script>
 </body>
 </html>

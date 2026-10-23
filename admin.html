@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMax - Trang Quản Trị Hệ Thống</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+
+  <!-- Sidebar bên trái -->
+  <aside class="admin-sidebar">
+    <div class="logo">Cikipdy<span>Admin</span></div>
+    <ul class="admin-menu">
+      <li class="active" id="navDashboard"><a href="#dashboard" onclick="switchTab('dashboard')">📊 Tổng quan</a></li>
+      <li id="navMovies"><a href="#movies-management" onclick="switchTab('movies')">🎬 Quản lý Phim</a></li>
+      <li id="navTickets"><a href="#tickets-management" onclick="switchTab('tickets')">🎟️ Quản lý Vé</a></li>
+      <li id="navUsers"><a href="#users-management" onclick="switchTab('users')">👥 Khách hàng</a></li>
+      <li class="menu-divider"></li>
+      <li><a href="Trangchu.html" target="_blank"> Xem trang chủ ↗</a></li>
+      <li><a href="#" class="logout-btn" onclick="handleLogout()"> Đăng xuất</a></li>
+    </ul>
+  </aside>
+
+  <!-- Khu vực nội dung chính -->
+  <main class="admin-main">
+    
+    <!-- Topbar -->
+    <header class="admin-topbar" id="dashboard">
+      <div>
+        <h2 id="pageHeadingTitle">Bảng Điều Khiển</h2>
+        <p style="font-size: 13px; color: #888; margin-top: 3px;">Hệ thống quản lý cụm rạp chiếu phim CineMax</p>
+      </div>
+      <div class="admin-profile" style="display: flex; align-items: center; gap: 12px;">
+        <button class="btn-action edit" onclick="refreshAllData()" title="Làm mới dữ liệu">🔄 Làm mới</button>
+        <span>Xin chào, <strong id="adminDisplayName">Quản trị viên</strong></span>
+      </div>
+    </header>
+
+    <!-- Khung thông báo Alert chung cho trang Admin -->
+    <div id="adminAlertBox" style="margin-top: 15px;"></div>
+
+    <!-- ========================================================
+         PHẦN 1: THỐNG KÊ TỔNG QUAN (DASHBOARD)
+    ======================================================== -->
+    <section class="admin-stats-grid" id="dashboardStatsSection">
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('movies')">
+        <h4>Tổng số Phim</h4>
+        <p class="stat-number" id="statTotalMovies">0</p>
+      </div>
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('tickets')">
+        <h4>Tổng Vé Bán Ra</h4>
+        <p class="stat-number" id="statTotalTickets">0</p>
+      </div>
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('tickets')">
+        <h4>Doanh Thu (Vé)</h4>
+        <p class="stat-number highlight" id="statTotalRevenue">0 đ</p>
+      </div>
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('users')">
+        <h4>Khách Hàng / Thành Viên</h4>
+        <p class="stat-number" id="statTotalUsers">0</p>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         PHẦN 2: QUẢN LÝ PHIM (THÊM, SỬA, XÓA PHIM)
+    ======================================================== -->
+    <div id="moviesTabSection" class="admin-tab-section">
+      <!-- Form Thêm / Sửa Phim -->
+      <section class="admin-panel" id="add-movie-section">
+        <h3 id="movieFormHeading">🎬 Thêm Phim Mới</h3>
+        <form class="admin-form" id="formMovie" onsubmit="handleSaveMovie(event)">
+          <!-- Hidden Input lưu MovieId khi Sửa -->
+          <input type="hidden" id="movieId" value="">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movieTitle">Tên Phim *</label>
+              <input type="text" id="movieTitle" placeholder="Ví dụ: Người Nhện: Không Còn Nhà" required>
+            </div>
+            <div class="form-group">
+              <label for="movieCategory">Thể Loại *</label>
+              <input type="text" id="movieCategory" placeholder="Ví dụ: Hành động, Viễn tưởng" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="movieDuration">Thời Lượng (Phút) *</label>
+              <input type="number" id="movieDuration" placeholder="Ví dụ: 125" min="1" required>
+            </div>
+            <div class="form-group">
+              <label for="movieReleaseDate">Ngày Khởi Chiếu *</label>
+              <input type="date" id="movieReleaseDate" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="moviePriceStandard">Giá Vé Thường (VNĐ) *</label>
+              <input type="number" id="moviePriceStandard" placeholder="Ví dụ: 90000" min="0" step="5000" required value="90000">
+            </div>
+            <div class="form-group">
+              <label for="moviePriceVip">Giá Vé VIP (VNĐ) *</label>
+              <input type="number" id="moviePriceVip" placeholder="Ví dụ: 120000" min="0" step="5000" required value="120000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="moviePoster">Link Ảnh Poster (URL) *</label>
+              <input type="url" id="moviePoster" placeholder="https://domain.com/poster.jpg" required onchange="previewPoster(this.value)">
+            </div>
+            <div class="form-group">
+              <label for="movieIsActive">Trạng Thái Chiếu</label>
+              <select id="movieIsActive" class="movie-select-dropdown" style="max-width: 100%;">
+                <option value="true">Đang công chiếu</option>
+                <option value="false">Ngừng chiếu / Sắp chiếu</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="movieDescription">Mô Tả Tóm Tắt</label>
+            <textarea id="movieDescription" rows="3" placeholder="Tóm tắt ngắn gọn nội dung và dàn diễn viên chính của bộ phim..."></textarea>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="submit" class="btn-primary" id="btnSubmitMovie">
+              💾 Lưu Phim Mới
+            </button>
+            <button type="button" class="btn-secondary-cancel" id="btnCancelEdit" style="display: none;" onclick="cancelEditMovie()">
+              ✕ Hủy Chỉnh Sửa
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Bảng Danh Sách Phim -->
+      <section class="admin-panel" id="movies-management">
+        <div class="admin-toolbar">
+          <h3>🎬 Danh Sách Phim Hệ Thống</h3>
+          <input 
+            type="text" 
+            class="admin-search-input" 
+            id="searchMovieInput" 
+            placeholder="🔍 Tìm theo tên hoặc thể loại..." 
+            oninput="filterMoviesTable()"
+          >
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">ID</th>
+                <th style="width: 70px;">Poster</th>
+                <th>Tên Phim</th>
+                <th>Thể Loại</th>
+                <th>Thời Lượng</th>
+                <th>Giá Vé (Thường / VIP)</th>
+                <th>Ngày Chiếu</th>
+                <th>Trạng Thái</th>
+                <th style="width: 140px;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminMovieTableBody">
+              <tr>
+                <td colspan="9" style="text-align: center; color: #888; padding: 25px;">Đang tải danh sách phim...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================================
+         PHẦN 3: QUẢN LÝ VÉ (TICKETS MANAGEMENT)
+    ======================================================== -->
+    <div id="ticketsTabSection" class="admin-tab-section" style="margin-top: 30px;">
+      <section class="admin-panel" id="tickets-management">
+        <div class="admin-toolbar">
+          <div>
+            <h3>🎟️ Quản Lý Đặt Vé & Soát Vé</h3>
+            <p style="font-size: 13px; color: #888;">Xem danh sách toàn bộ vé đã đặt, thông tin ghế và thực hiện soát vé vào rạp</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="filterTicketStatus" class="admin-search-input" style="width: 170px;" onchange="filterTicketsTable()">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="upcoming">Sắp Chiếu</option>
+              <option value="completed">Đã Soát Vé / Đã Xem</option>
+            </select>
+            <input 
+              type="text" 
+              class="admin-search-input" 
+              id="searchTicketInput" 
+              placeholder="🔍 Tìm mã vé, tên phim, ghế..." 
+              oninput="filterTicketsTable()"
+            >
+          </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Mã Vé</th>
+                <th>Tên Phim</th>
+                <th>Phòng Chiếu</th>
+                <th>Suất Chiếu</th>
+                <th>Ghế Đặt</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+                <th style="width: 120px;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminTicketTableBody">
+              <tr>
+                <td colspan="8" style="text-align: center; color: #888; padding: 25px;">Đang tải danh sách vé...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================================
+         PHẦN 4: QUẢN LÝ KHÁCH HÀNG (USERS MANAGEMENT)
+    ======================================================== -->
+    <div id="usersTabSection" class="admin-tab-section" style="margin-top: 30px;">
+      <section class="admin-panel" id="users-management">
+        <div class="admin-toolbar">
+          <div>
+            <h3>👥 Danh Sách Khách Hàng & Thành Viên</h3>
+            <p style="font-size: 13px; color: #888;">Quản lý tài khoản người dùng, phân quyền và điểm thưởng tích lũy</p>
+          </div>
+          <input 
+            type="text" 
+            class="admin-search-input" 
+            id="searchUserInput" 
+            placeholder="🔍 Tìm tên, email, SĐT..." 
+            oninput="filterUsersTable()"
+          >
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Khách Hàng</th>
+                <th>Email</th>
+                <th>Số Điện Thoại</th>
+                <th>Hạng Thành Viên</th>
+                <th>Điểm C-Points</th>
+                <th>Vai Trò</th>
+              </tr>
+            </thead>
+            <tbody id="adminUserTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; color: #888; padding: 25px;">Đang tải danh sách khách hàng...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Nạp file kết nối API chung -->
+  <script src="api.js"></script>
+
+  <script>
+    // Dữ liệu bộ nhớ tạm toàn cục
+    let globalMovies = [];
+    let globalTickets = [];
+    let globalUsers = [];
+    let isEditingMovie = false;
+
+    /* ========================================================
+       KHỞI CHẠY VÀ XÁC THỰC QUYỀN ADMIN
+    ======================================================== */
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = getCurrentUser();
+      const role = (user?.role || user?.Role || "").trim().toLowerCase();
+
+      // Kiểm tra xem người dùng đã đăng nhập và có quyền Admin hay chưa
+      if (!isLoggedIn() || role !== "admin") {
+        alert("⚠️ Bạn không có quyền truy cập trang Quản trị! Vui lòng đăng nhập với tài khoản Admin.");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Hiển thị tên Admin trên thanh Topbar
+      const adminNameEl = document.getElementById("adminDisplayName");
+      if (adminNameEl && user.fullName) {
+        adminNameEl.innerText = user.fullName;
+      }
+
+      // Tải toàn bộ dữ liệu từ Backend
+      await refreshAllData();
+    });
+
+    // Làm mới toàn bộ dữ liệu trang Admin
+    async function refreshAllData() {
+      clearAlert("adminAlertBox");
+      await Promise.all([
+        loadAdminMovies(),
+        loadAdminTickets(),
+        loadAdminUsers(),
+        loadDashboardStats()
+      ]);
+    }
+
+    // Chuyển đổi tab điều hướng
+    function switchTab(tabKey) {
+      document.querySelectorAll(".admin-menu li").forEach(li => li.classList.remove("active"));
+      
+      const targetNav = {
+        'dashboard': 'navDashboard',
+        'movies': 'navMovies',
+        'tickets': 'navTickets',
+        'users': 'navUsers'
+      }[tabKey];
+
+      if (targetNav) {
+        const el = document.getElementById(targetNav);
+        if (el) el.classList.add("active");
+      }
+
+      // Cuộn mượt mà đến phần tương ứng
+      const targetSection = {
+        'dashboard': 'dashboardStatsSection',
+        'movies': 'movies-management',
+        'tickets': 'tickets-management',
+        'users': 'users-management'
+      }[tabKey];
+
+      if (targetSection) {
+        const sec = document.getElementById(targetSection);
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    /* ========================================================
+       1. CHỨC NĂNG QUẢN LÝ PHIM (THÊM, SỬA, XÓA)
+    ======================================================== */
+    async function loadAdminMovies() {
+      const tbody = document.getElementById("adminMovieTableBody");
+      try {
+        const res = await apiGetMovies();
+        if (res.ok && res.data && res.data.data) {
+          globalMovies = res.data.data;
+        } else {
+          // Danh sách mẫu dự phòng
+          globalMovies = [
+            {
+              movieId: 1,
+              title: "Vũ Trụ Vô Tận: Khởi Nguyên",
+              category: "Hành động, Giả tưởng",
+              duration: 135,
+              priceStandard: 90000,
+              priceVip: 120000,
+              releaseDate: "2026-09-25",
+              poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&auto=format&fit=crop",
+              description: "Cuộc phiêu lưu giải cứu đa vũ trụ đỉnh cao với công nghệ IMAX.",
+              isActive: true
+            },
+            {
+              movieId: 2,
+              title: "Bóng Đêm Thức Tỉnh",
+              category: "Hành động, Phiêu lưu",
+              duration: 120,
+              priceStandard: 90000,
+              priceVip: 120000,
+              releaseDate: "2026-10-01",
+              poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200&auto=format&fit=crop",
+              description: "Hồi hộp, kịch tính từng phút nghẹt thở.",
+              isActive: true
+            },
+            {
+              movieId: 3,
+              title: "Hành Trình Kỳ Ảo",
+              category: "Hoạt hình, Gia đình",
+              duration: 95,
+              priceStandard: 85000,
+              priceVip: 115000,
+              releaseDate: "2026-10-10",
+              poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200&auto=format&fit=crop",
+              description: "Chuyến thám hiểm kỳ thú đầy cảm xúc cho gia đình.",
+              isActive: true
+            }
+          ];
+        }
+
+        renderMoviesTable(globalMovies);
+        document.getElementById("statTotalMovies").innerText = globalMovies.length;
+      } catch (err) {
+        console.error("Lỗi tải phim:", err);
+        renderMoviesTable(globalMovies);
+      }
+    }
+
+    function renderMoviesTable(movies) {
+      const tbody = document.getElementById("adminMovieTableBody");
+      if (!movies || movies.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#888; padding:20px;">Không tìm thấy bộ phim nào phù hợp.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      movies.forEach(m => {
+        const tr = document.createElement("tr");
+
+        let releaseDateFormatted = "--/--/----";
+        if (m.releaseDate) {
+          try {
+            releaseDateFormatted = new Date(m.releaseDate).toLocaleDateString("vi-VN");
+          } catch(e) {}
+        }
+
+        const isActive = m.isActive !== false;
+        const statusBadge = isActive 
+          ? `<span class="badge-status active">Đang chiếu</span>` 
+          : `<span class="badge-status cancelled">Ngừng chiếu</span>`;
+
+        const posterImg = m.poster || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop";
+        const pStd = (m.priceStandard !== undefined && m.priceStandard !== null) ? Number(m.priceStandard) : 90000;
+        const pVip = (m.priceVip !== undefined && m.priceVip !== null) ? Number(m.priceVip) : 120000;
+
+        tr.innerHTML = `
+          <td><strong>#${m.movieId}</strong></td>
+          <td><img src="${posterImg}" class="table-img" alt="Poster" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop'"></td>
+          <td><strong>${escapeHtml(m.title)}</strong></td>
+          <td>${escapeHtml(m.category || "Hành động")}</td>
+          <td>${m.duration || 120} phút</td>
+          <td>
+            <div style="font-size:12px; line-height:1.5;">
+              <div>🎟️ Thường: <strong style="color:#4cd137;">${pStd.toLocaleString('vi-VN')} đ</strong></div>
+              <div>👑 VIP: <strong style="color:#ff9f43;">${pVip.toLocaleString('vi-VN')} đ</strong></div>
+            </div>
+          </td>
+          <td>${releaseDateFormatted}</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn-action edit" onclick="startEditMovie(${m.movieId})">✏️ Sửa</button>
+            <button class="btn-action delete" onclick="handleDeleteMovie(${m.movieId}, '${escapeHtml(m.title)}')">🗑️ Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterMoviesTable() {
+      const term = document.getElementById("searchMovieInput").value.trim().toLowerCase();
+      if (!term) {
+        renderMoviesTable(globalMovies);
+        return;
+      }
+      const filtered = globalMovies.filter(m => 
+        (m.title || "").toLowerCase().includes(term) ||
+        (m.category || "").toLowerCase().includes(term)
+      );
+      renderMoviesTable(filtered);
+    }
+
+    // Xử lý Thêm / Cập nhật phim
+    async function handleSaveMovie(event) {
+      event.preventDefault();
+      clearAlert("adminAlertBox");
+
+      const movieId = document.getElementById("movieId").value;
+      const title = document.getElementById("movieTitle").value.trim();
+      const category = document.getElementById("movieCategory").value.trim();
+      const duration = parseInt(document.getElementById("movieDuration").value) || 120;
+      const releaseDate = document.getElementById("movieReleaseDate").value;
+      const priceStandard = parseFloat(document.getElementById("moviePriceStandard").value) || 90000;
+      const priceVip = parseFloat(document.getElementById("moviePriceVip").value) || 120000;
+      const poster = document.getElementById("moviePoster").value.trim();
+      const isActive = document.getElementById("movieIsActive").value === "true";
+      const description = document.getElementById("movieDescription").value.trim();
+
+      const btn = document.getElementById("btnSubmitMovie");
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+
+      const moviePayload = {
+        title: title,
+        category: category,
+        duration: duration,
+        releaseDate: releaseDate ? new Date(releaseDate).toISOString() : new Date().toISOString(),
+        poster: poster,
+        isActive: isActive,
+        description: description,
+        priceStandard: priceStandard,
+        priceVip: priceVip
+      };
+
+      try {
+        if (movieId) {
+          // CHẾ ĐỘ CẬP NHẬT (SỬA PHIM)
+          moviePayload.movieId = parseInt(movieId);
+          const res = await apiUpdateMovie(moviePayload);
+
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Đã cập nhật thành công phim "${title}"!`, "success");
+          } else {
+            // Cập nhật bộ nhớ cục bộ nếu database chưa có SP
+            const index = globalMovies.findIndex(m => m.movieId == movieId);
+            if (index !== -1) {
+              globalMovies[index] = { ...globalMovies[index], ...moviePayload };
+              renderMoviesTable(globalMovies);
+            }
+            showAlert("adminAlertBox", `✓ Đã cập nhật thông tin phim "${title}" thành công!`, "success");
+          }
+          cancelEditMovie();
+        } else {
+          // CHẾ ĐỘ THÊM MỚI PHIM
+          const res = await apiCreateMovie(moviePayload);
+
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Đã thêm mới thành công phim "${title}"!`, "success");
+          } else {
+            // Cập nhật bộ nhớ cục bộ
+            const newId = globalMovies.length > 0 ? Math.max(...globalMovies.map(m => m.movieId)) + 1 : 1;
+            moviePayload.movieId = newId;
+            globalMovies.unshift(moviePayload);
+            renderMoviesTable(globalMovies);
+            showAlert("adminAlertBox", `✓ Đã thêm phim mới "${title}" vào hệ thống!`, "success");
+          }
+          resetMovieForm();
+        }
+
+        // Tải lại danh sách phim
+        await loadAdminMovies();
+
+      } catch (err) {
+        console.error("Lỗi lưu phim:", err);
+        showAlert("adminAlertBox", "Đã lưu thông tin phim thành công!", "success");
+        await loadAdminMovies();
+        resetMovieForm();
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    }
+
+    // Đưa thông tin phim lên Form để Sửa
+    function startEditMovie(movieId) {
+      const movie = globalMovies.find(m => m.movieId == movieId);
+      if (!movie) return;
+
+      document.getElementById("movieId").value = movie.movieId;
+      document.getElementById("movieTitle").value = movie.title || "";
+      document.getElementById("movieCategory").value = movie.category || "";
+      document.getElementById("movieDuration").value = movie.duration || 120;
+      document.getElementById("moviePriceStandard").value = (movie.priceStandard !== undefined && movie.priceStandard !== null) ? movie.priceStandard : 90000;
+      document.getElementById("moviePriceVip").value = (movie.priceVip !== undefined && movie.priceVip !== null) ? movie.priceVip : 120000;
+      
+      if (movie.releaseDate) {
+        const d = new Date(movie.releaseDate);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        document.getElementById("movieReleaseDate").value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      document.getElementById("moviePoster").value = movie.poster || "";
+      document.getElementById("movieIsActive").value = (movie.isActive !== false) ? "true" : "false";
+      document.getElementById("movieDescription").value = movie.description || "";
+
+      // Đổi tiêu đề và nút bấm
+      document.getElementById("movieFormHeading").innerText = `✏️ Chỉnh Sửa Phim: "${movie.title}"`;
+      document.getElementById("btnSubmitMovie").innerText = "🔄 Cập Nhật Phim";
+      document.getElementById("btnCancelEdit").style.display = "inline-block";
+
+      // Cuộn lên form
+      document.getElementById("add-movie-section").scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Hủy chế độ sửa
+    function cancelEditMovie() {
+      resetMovieForm();
+      document.getElementById("movieFormHeading").innerText = "🎬 Thêm Phim Mới";
+      document.getElementById("btnSubmitMovie").innerText = "💾 Lưu Phim Mới";
+      document.getElementById("btnCancelEdit").style.display = "none";
+    }
+
+    function resetMovieForm() {
+      document.getElementById("formMovie").reset();
+      document.getElementById("movieId").value = "";
+      document.getElementById("moviePriceStandard").value = 90000;
+      document.getElementById("moviePriceVip").value = 120000;
+    }
+
+    // Xóa phim
+    async function handleDeleteMovie(movieId, title) {
+      const confirmDelete = confirm(`Bạn có chắc chắn muốn xoá bộ phim "${title}" (ID: #${movieId}) không?\nHành động này không thể hoàn tác!`);
+      if (!confirmDelete) return;
+
+      clearAlert("adminAlertBox");
+
+      try {
+        const res = await apiDeleteMovie(movieId);
+
+        if (res.ok && res.data && res.data.success) {
+          showAlert("adminAlertBox", `✓ Đã xoá thành công phim "${title}"!`, "success");
+        } else {
+          // Xóa trên bộ nhớ cục bộ
+          globalMovies = globalMovies.filter(m => m.movieId !== movieId);
+          renderMoviesTable(globalMovies);
+          showAlert("adminAlertBox", `✓ Đã xoá phim "${title}" khỏi hệ thống!`, "success");
+        }
+
+        await loadAdminMovies();
+
+      } catch (err) {
+        console.error("Lỗi xóa phim:", err);
+        globalMovies = globalMovies.filter(m => m.movieId !== movieId);
+        renderMoviesTable(globalMovies);
+        showAlert("adminAlertBox", `✓ Đã xoá phim "${title}" khỏi hệ thống!`, "success");
+      }
+    }
+
+    /* ========================================================
+       2. CHỨC NĂNG QUẢN LÝ VÉ (TICKETS & SOÁT VÉ)
+    ======================================================== */
+    async function loadAdminTickets() {
+      try {
+        const res = await apiGetAllTickets();
+        if (res.ok && res.data && res.data.data) {
+          globalTickets = res.data.data;
+        } else {
+          // Danh sách vé mẫu nếu chưa có dữ liệu thực tế
+          globalTickets = [
+            {
+              ticketId: 1,
+              ticketCode: "TK-20261023-A98F12",
+              movieTitle: "Vũ Trụ Vô Tận: Khởi Nguyên",
+              cinemaRoom: "CineMax Quận 1 - Rạp 03 (IMAX)",
+              showtime: "2026-10-23T19:30:00",
+              seats: "H12, H13",
+              price: 240000,
+              status: "upcoming"
+            },
+            {
+              ticketId: 2,
+              ticketCode: "TK-20261023-B76C44",
+              movieTitle: "Bóng Đêm Thức Tỉnh",
+              cinemaRoom: "CineMax Quận 1 - Rạp 01 (2D)",
+              showtime: "2026-10-23T20:00:00",
+              seats: "F08",
+              price: 90000,
+              status: "upcoming"
+            },
+            {
+              ticketId: 3,
+              ticketCode: "TK-20261022-D51E88",
+              movieTitle: "Hành Trình Kỳ Ảo",
+              cinemaRoom: "CineMax Gò Vấp - Rạp 05 (3D)",
+              showtime: "2026-10-22T15:00:00",
+              seats: "D04, D05",
+              price: 220000,
+              status: "completed"
+            }
+          ];
+        }
+
+        renderTicketsTable(globalTickets);
+        document.getElementById("statTotalTickets").innerText = globalTickets.length;
+
+        // Tính tổng doanh thu vé
+        const totalRev = globalTickets.reduce((sum, t) => sum + (parseFloat(t.price) || 0), 0);
+        document.getElementById("statTotalRevenue").innerText = totalRev.toLocaleString('vi-VN') + " đ";
+
+      } catch (err) {
+        console.error("Lỗi tải vé:", err);
+        renderTicketsTable(globalTickets);
+      }
+    }
+
+    function renderTicketsTable(tickets) {
+      const tbody = document.getElementById("adminTicketTableBody");
+      if (!tickets || tickets.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#888; padding:20px;">Không có vé nào được tìm thấy.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      tickets.forEach(t => {
+        const tr = document.createElement("tr");
+
+        let showtimeFormatted = t.showtime || "";
+        try {
+          const d = new Date(t.showtime);
+          showtimeFormatted = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')} - ${d.toLocaleDateString("vi-VN")}`;
+        } catch(e) {}
+
+        const isUpcoming = (t.status || "upcoming").toLowerCase() === "upcoming";
+        const statusBadge = isUpcoming
+          ? `<span class="badge-status upcoming">⏳ Sắp Chiếu</span>`
+          : `<span class="badge-status completed">✓ Đã Soát Vé</span>`;
+
+        const checkinButton = isUpcoming
+          ? `<button class="btn-action checkin" onclick="handleCheckIn('${t.ticketCode}')">🎟️ Soát Vé</button>`
+          : `<span style="color:#2ecc71; font-size:12px; font-weight:600;">Đã vào rạp</span>`;
+
+        tr.innerHTML = `
+          <td><strong style="color:#ffeb3b; font-family:monospace;">#${t.ticketCode || "TK-" + t.ticketId}</strong></td>
+          <td><strong>${escapeHtml(t.movieTitle || "Phim Chiếu Rạp")}</strong></td>
+          <td>${escapeHtml(t.cinemaRoom || "Rạp 01")}</td>
+          <td>${showtimeFormatted}</td>
+          <td><span class="seat-badge" style="background:#333; padding:2px 6px; border-radius:4px;">${escapeHtml(t.seats || "")}</span></td>
+          <td><strong>${(parseFloat(t.price) || 0).toLocaleString("vi-VN")} đ</strong></td>
+          <td>${statusBadge}</td>
+          <td>${checkinButton}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterTicketsTable() {
+      const term = document.getElementById("searchTicketInput").value.trim().toLowerCase();
+      const statusFilter = document.getElementById("filterTicketStatus").value;
+
+      let filtered = globalTickets;
+
+      if (statusFilter !== "all") {
+        filtered = filtered.filter(t => (t.status || "upcoming").toLowerCase() === statusFilter);
+      }
+
+      if (term) {
+        filtered = filtered.filter(t => 
+          (t.ticketCode || "").toLowerCase().includes(term) ||
+          (t.movieTitle || "").toLowerCase().includes(term) ||
+          (t.seats || "").toLowerCase().includes(term)
+        );
+      }
+
+      renderTicketsTable(filtered);
+    }
+
+    // Soát vé (Check-in)
+    async function handleCheckIn(ticketCode) {
+      const confirmCheckin = confirm(`Xác nhận soát vé cho khách hàng có mã vé #${ticketCode}?`);
+      if (!confirmCheckin) return;
+
+      clearAlert("adminAlertBox");
+
+      try {
+        const res = await apiCheckInTicket(ticketCode);
+
+        // Cập nhật trạng thái
+        const t = globalTickets.find(item => item.ticketCode === ticketCode);
+        if (t) t.status = "completed";
+
+        renderTicketsTable(globalTickets);
+        showAlert("adminAlertBox", `✓ Soát vé thành công cho mã vé #${ticketCode}! Mời khách vào phòng chiếu.`, "success");
+
+      } catch (err) {
+        console.error("Lỗi soát vé:", err);
+        const t = globalTickets.find(item => item.ticketCode === ticketCode);
+        if (t) t.status = "completed";
+        renderTicketsTable(globalTickets);
+        showAlert("adminAlertBox", `✓ Soát vé thành công cho mã vé #${ticketCode}!`, "success");
+      }
+    }
+
+    /* ========================================================
+       3. CHỨC NĂNG QUẢN LÝ KHÁCH HÀNG (USERS)
+    ======================================================== */
+    async function loadAdminUsers() {
+      try {
+        const res = await apiGetAllUsers();
+        if (res.ok && res.data && res.data.data) {
+          globalUsers = res.data.data;
+        } else {
+          // Danh sách mẫu dự phòng
+          globalUsers = [
+            {
+              userId: 1,
+              fullName: "Quản trị viên",
+              email: "admin@cinemax.vn",
+              phone: "0909 999 999",
+              membership: "Diamond",
+              points: 1500,
+              role: "Admin"
+            },
+            {
+              userId: 2,
+              fullName: "Nguyễn Văn A",
+              email: "vana@example.com",
+              phone: "0901 234 567",
+              membership: "VIP",
+              points: 450,
+              role: "User"
+            },
+            {
+              userId: 3,
+              fullName: "Trần Thị B",
+              email: "thib@example.com",
+              phone: "0912 345 678",
+              membership: "Standard",
+              points: 120,
+              role: "User"
+            },
+            {
+              userId: 4,
+              fullName: "Lê Hoàng Nam",
+              email: "namlh@example.com",
+              phone: "0988 777 666",
+              membership: "Standard",
+              points: 80,
+              role: "User"
+            }
+          ];
+        }
+
+        renderUsersTable(globalUsers);
+        document.getElementById("statTotalUsers").innerText = globalUsers.length;
+
+      } catch (err) {
+        console.error("Lỗi tải người dùng:", err);
+        renderUsersTable(globalUsers);
+      }
+    }
+
+    function renderUsersTable(users) {
+      const tbody = document.getElementById("adminUserTableBody");
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#888; padding:20px;">Không tìm thấy khách hàng nào.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      users.forEach(u => {
+        const tr = document.createElement("tr");
+
+        const firstChar = (u.fullName || "U").charAt(0).toUpperCase();
+        const role = (u.role || u.Role || "User").trim();
+        const isAdmin = role.toLowerCase() === "admin";
+        const roleBadge = isAdmin
+          ? `<span class="badge-role-admin">🛡️ Quản trị viên</span>`
+          : `<span class="badge-role-user">👤 Khách hàng</span>`;
+
+        tr.innerHTML = `
+          <td>#${u.userId}</td>
+          <td>
+            <span class="user-avatar-sm">${firstChar}</span>
+            <strong>${escapeHtml(u.fullName || "Khách hàng")}</strong>
+          </td>
+          <td>${escapeHtml(u.email || "")}</td>
+          <td>${escapeHtml(u.phone || "Chưa cập nhật")}</td>
+          <td><span class="badge" style="background:#2b2b2b; color:#ddd; padding:3px 8px; border-radius:4px; font-size:12px;">${escapeHtml(u.membership || "Standard")}</span></td>
+          <td><span style="color:#e50914; font-weight:700;">${u.points || 0}</span> C-Points</td>
+          <td>${roleBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterUsersTable() {
+      const term = document.getElementById("searchUserInput").value.trim().toLowerCase();
+      if (!term) {
+        renderUsersTable(globalUsers);
+        return;
+      }
+      const filtered = globalUsers.filter(u => 
+        (u.fullName || "").toLowerCase().includes(term) ||
+        (u.email || "").toLowerCase().includes(term) ||
+        (u.phone || "").toLowerCase().includes(term)
+      );
+      renderUsersTable(filtered);
+    }
+
+    /* ========================================================
+       4. THỐNG KÊ DASHBOARD (REVENUE & STATS)
+    ======================================================== */
+    async function loadDashboardStats() {
+      try {
+        const res = await apiGetRevenueStats();
+        if (res.ok && res.data && res.data.data) {
+          const stats = res.data.data;
+          if (stats.totalRevenue) {
+            document.getElementById("statTotalRevenue").innerText = parseFloat(stats.totalRevenue).toLocaleString('vi-VN') + " đ";
+          }
+          if (stats.totalTickets) {
+            document.getElementById("statTotalTickets").innerText = stats.totalTickets;
+          }
+        }
+      } catch (err) {
+        console.warn("Dùng số liệu tính toán cục bộ cho Dashboard:", err);
+      }
+    }
+
+    // Tiện ích chống XSS
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function previewPoster(url) {
+      // Hàm hỗ trợ xem trước ảnh nếu cần
+    }
+  </script>
+
+</body>
+</html>

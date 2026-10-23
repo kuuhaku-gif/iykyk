@@ -11,12 +11,12 @@
 
   <!-- Navbar -->
   <header class="navbar">
-    <div class="logo"><a href="index.html">Cikipdy<span>Max</span></a></div>
+    <div class="logo"><a href="Trangchu.html">Cikipdy<span>Max</span></a></div>
     <nav>
       <ul class="nav-links">
-        <li><a href="index.html">Trang chủ</a></li>
-        <li><a href="index.html#movies">Phim đang chiếu</a></li>
-        <li><a href="index.html#prices">Giá vé</a></li>
+        <li><a href="Trangchu.html">Trang chủ</a></li>
+        <li><a href="Trangchu.html#movies">Phim đang chiếu</a></li>
+        <li><a href="Trangchu.html#prices">Giá vé</a></li>
       </ul>
     </nav>
     <div class="user-menu">
@@ -33,33 +33,35 @@
     <!-- Cột bên trái: Thẻ thông tin cá nhân -->
     <aside class="profile-card">
       <div class="profile-header">
-        <img src="" alt="Avatar" class="avatar-lg">
-        <h3>Nguyễn Văn A</h3>
-        <span class="badge">Thành Viên</span>
+        <div class="avatar-lg" id="profileAvatar" style="background:#e50914; color:#fff; width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; margin:0 auto 15px;">U</div>
+        <h3 id="profileFullName">Nguyễn Văn A</h3>
+        <span class="badge" id="profileBadge">Thành Viên</span>
       </div>
 
       <div class="profile-details">
         <div class="detail-row">
           <span class="label">Email:</span>
-          <span class="value">vana@example.com</span>
+          <span class="value" id="profileEmail">vana@example.com</span>
         </div>
         <div class="detail-row">
           <span class="label">Số điện thoại:</span>
-          <span class="value">0901 234 567</span>
+          <span class="value" id="profilePhone">0901 234 567</span>
         </div>
         <div class="detail-row">
           <span class="label">Điểm tích luỹ:</span>
-          <span class="value highlight">450 C-Points</span>
+          <span class="value highlight" id="profilePoints">0 C-Points</span>
         </div>
         <div class="detail-row">
           <span class="label">Ngày tham gia:</span>
-          <span class="value">12/03/2025</span>
+          <span class="value" id="profileJoinedDate">--/--/----</span>
         </div>
       </div>
 
-      <div class="profile-actions">
-        <button class="btn-secondary btn-full">Chỉnh Sửa Thông Tin</button>
-        <a href="login.html" class="logout-link">Đăng xuất</a>
+      <div class="profile-actions" style="display:flex; flex-direction:column; gap:10px;">
+        <a href="reset-password.html" id="btnChangePassword" class="btn-secondary btn-full" style="text-align:center;">
+          🔒 Đổi Mật Khẩu
+        </a>
+        <a href="#" class="logout-link" onclick="handleLogout()" style="text-align:center;">Đăng xuất</a>
       </div>
     </aside>
 
@@ -67,7 +69,7 @@
     <section class="profile-content">
       <h2 class="section-title">Lịch Sử Mua Vé</h2>
 
-      <div class="ticket-list">
+      <div class="ticket-list" id="ticketList">
         <!-- Vé 1 (Sắp chiếu) -->
         <article class="ticket-item">
           <div class="ticket-status upcoming">Sắp Chiếu</div>
@@ -123,6 +125,90 @@
       <p>&copy; 2026 CiCikipdyMax. Mọi quyền được bảo lưu.</p>
     </div>
   </footer>
+
+  <!-- Kết nối API -->
+  <script src="api.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const user = getCurrentUser();
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Điền thông tin người dùng
+      document.getElementById("profileFullName").innerText = user.fullName || "Người dùng";
+      document.getElementById("profileAvatar").innerText = (user.fullName || "U").charAt(0).toUpperCase();
+      document.getElementById("profileBadge").innerText = user.role === "Admin" ? "Quản Trị Viên" : (user.membership || "Thành Viên");
+      document.getElementById("profileEmail").innerText = user.email || "";
+      document.getElementById("profilePhone").innerText = user.phone || "Chưa cập nhật";
+      document.getElementById("profilePoints").innerText = `${user.points || 0} C-Points`;
+
+      if (user.joinedDate) {
+        const d = new Date(user.joinedDate);
+        document.getElementById("profileJoinedDate").innerText = d.toLocaleDateString("vi-VN");
+      }
+
+      // Cập nhật link đổi mật khẩu kèm email
+      if (user.email) {
+        document.getElementById("btnChangePassword").href = `reset-password.html?email=${encodeURIComponent(user.email)}`;
+      }
+
+      // Gọi API lấy dữ liệu mới nhất
+      if (user.userId) {
+        const res = await apiGetProfile(user.userId);
+        if (res.ok && res.data && res.data.data) {
+          const freshData = res.data.data;
+          saveAuth(getToken(), freshData);
+          document.getElementById("profileFullName").innerText = freshData.fullName || user.fullName;
+          document.getElementById("profileEmail").innerText = freshData.email || user.email;
+          document.getElementById("profilePhone").innerText = freshData.phone || user.phone;
+          document.getElementById("profilePoints").innerText = `${freshData.points || 0} C-Points`;
+        }
+
+        // Tải lịch sử vé đã đặt của người dùng từ Backend
+        try {
+          const ticketRes = await apiGetTicketHistory(user.userId);
+          if (ticketRes.ok && ticketRes.data && ticketRes.data.data && ticketRes.data.data.length > 0) {
+            const listEl = document.getElementById("ticketList");
+            listEl.innerHTML = "";
+            ticketRes.data.data.forEach(t => {
+              const isUpcoming = (t.status || "upcoming").toLowerCase() === "upcoming";
+              const statusClass = isUpcoming ? "upcoming" : "completed";
+              const statusText = isUpcoming ? "Sắp Chiếu" : "Đã Xem";
+
+              let showtimeStr = t.showtime || "";
+              try {
+                const dt = new Date(t.showtime);
+                showtimeStr = `${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')} - ${dt.toLocaleDateString('vi-VN')}`;
+              } catch(e) {}
+
+              const seatBadges = (t.seats || "").split(",").map(s => `<span class="seat-badge">${s.trim()}</span>`).join(" ");
+
+              const art = document.createElement("article");
+              art.className = "ticket-item";
+              art.innerHTML = `
+                <div class="ticket-status ${statusClass}">${statusText}</div>
+                <div class="ticket-main">
+                  <h3>${t.movieTitle || "Vé Xem Phim"}</h3>
+                  <p class="ticket-info">Rạp: <strong>${t.cinemaRoom || "Rạp 01"}</strong></p>
+                  <p class="ticket-info">Suất chiếu: <strong>${showtimeStr}</strong></p>
+                  <p class="ticket-info">Ghế: ${seatBadges} (${t.ticketType || "2D"})</p>
+                </div>
+                <div class="ticket-side">
+                  <div class="ticket-price">${(t.price || 0).toLocaleString('vi-VN')} đ</div>
+                  <button class="btn-ticket">Mã Vé: #${t.ticketCode || "CNM"}</button>
+                </div>
+              `;
+              listEl.appendChild(art);
+            });
+          }
+        } catch(e) {
+          console.warn("Dùng danh sách vé mặc định:", e);
+        }
+      }
+    });
+  </script>
 
 </body>
 </html>

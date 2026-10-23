@@ -17,7 +17,11 @@
   <main class="auth-container">
     <div class="auth-card">
       <h2>Tạo Tài Khoản</h2>
-      <form class="auth-form" action="#" method="POST">
+
+      <!-- Hộp thông báo lỗi/thành công -->
+      <div id="registerAlert"></div>
+
+      <form class="auth-form" id="formRegister" onsubmit="handleRegister(event)">
         
         <div class="form-group">
           <label for="fullname">Họ và tên</label>
@@ -26,39 +30,98 @@
 
         <div class="form-group">
           <label for="email">Địa chỉ Email</label>
-          <input type="email" id="email" name="email" placeholder="example@email.com" required>
+          <input type="email" id="email" name="email" placeholder="example@email.com" required autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="phone">Số điện thoại</label>
-          <input type="tel" id="phone" name="phone" placeholder="0901 234 567" required>
+          <input type="tel" id="phone" name="phone" placeholder="0901 234 567" required autocomplete="tel">
         </div>
 
         <div class="form-group">
           <label for="password">Mật khẩu</label>
-          <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" minlength="6" required>
+          <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" minlength="6" required autocomplete="new-password">
         </div>
 
         <div class="form-group">
           <label for="confirm-password">Xác nhận mật khẩu</label>
-          <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu" required>
+          <input type="password" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu" required autocomplete="new-password">
         </div>
 
         <div class="form-options">
           <label class="remember-me">
-            <input type="checkbox" name="terms" required> Tôi đồng ý với điều khoản sử dụng
+            <input type="checkbox" id="terms" name="terms" required> Tôi đồng ý với điều khoản sử dụng
           </label>
         </div>
 
-        <button type="submit" class="btn-primary btn-full">Đăng Ký</button>
+        <button type="submit" id="btnRegister" class="btn-primary btn-full">Đăng Ký</button>
       </form>
 
       <div class="auth-footer">
         <p>Đã có tài khoản? <a href="login.html">Đăng nhập ngay</a></p>
-        <p><a href="index.html" class="back-home">← Quay lại trang chủ</a></p>
+        <p><a href="Trangchu.html" class="back-home">← Quay lại trang chủ</a></p>
       </div>
     </div>
   </main>
+
+  <!-- Kết nối API Backend & Gateway -->
+  <script src="api.js"></script>
+
+  <script>
+    async function handleRegister(event) {
+      event.preventDefault();
+      clearAlert("registerAlert");
+
+      const fullName = document.getElementById("fullname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+      const terms = document.getElementById("terms").checked;
+      const btn = document.getElementById("btnRegister");
+
+      if (!terms) {
+        showAlert("registerAlert", "Bạn cần đồng ý với điều khoản sử dụng để tiếp tục!", "danger");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showAlert("registerAlert", "Mật khẩu xác nhận không khớp!", "danger");
+        return;
+      }
+
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+
+      try {
+        const res = await apiRegister({
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          password: password,
+          role: "User",
+          membership: "Standard"
+        });
+
+        if (res.ok && res.data && res.data.success) {
+          showAlert("registerAlert", res.data.message || "Đăng ký tài khoản thành công! Đang chuyển đến trang đăng nhập...", "success");
+
+          setTimeout(() => {
+            window.location.href = "login.html";
+          }, 1200);
+
+        } else {
+          const msg = res.data?.message || "Đăng ký thất bại. Vui lòng thử lại!";
+          showAlert("registerAlert", msg, "danger");
+        }
+      } catch (err) {
+        showAlert("registerAlert", "Lỗi kết nối máy chủ khi đăng ký tài khoản!", "danger");
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    }
+  </script>
 
 </body>
 </html>

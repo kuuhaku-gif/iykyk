@@ -10,42 +10,51 @@
 <body>
 
   <!-- Header -->
-  <header class="header">
-    <div class="logo"><a href="index.html">Cine<span>Max</span></a></div>
-    <nav class="nav-links">
-      <a href="index.html">Trang Chủ</a>
-      <a href="index.html#movies">Phim Đang Chiếu</a>
-      <a href="profile.html">Vé Của Tôi</a>
+  <header class="navbar">
+    <div class="logo"><a href="Trangchu.html">Cikipdy<span>Max</span></a></div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="Trangchu.html">Trang Chủ</a></li>
+        <li><a href="Trangchu.html#movies">Phim Đang Chiếu</a></li>
+        <li><a href="profile.html">Vé Của Tôi</a></li>
+      </ul>
     </nav>
-    <div class="header-auth">
-      <a href="profile.html" class="user-greeting">👤 Nguyễn Văn A</a>
+    <div class="user-menu" id="headerAuthContainer">
+      <a href="login.html" class="btn-primary">Đăng Nhập</a>
     </div>
   </header>
 
   <!-- Main Booking Container -->
   <div class="booking-container">
     
-    <!-- Cột bên trái: Chọn suất chiếu & Sơ đồ ghế -->
+    <!-- Cột bên trái: Chọn phim, suất chiếu & Sơ đồ ghế -->
     <div class="seat-selection-section">
       
-      <!-- Bộ lọc suất chiếu -->
+      <!-- Bộ lọc phim & suất chiếu -->
       <div class="booking-filter">
-        <h3>1. Chọn Suất Chiếu</h3>
+        <h3>1. Chọn Phim & Suất Chiếu</h3>
+        
+        <!-- Chọn phim -->
         <div class="filter-group">
+          <label for="selectMovie">Bộ phim đang chọn:</label>
+          <select id="selectMovie" class="movie-select-dropdown" onchange="onMovieChange(this.value)">
+            <option value="">Đang tải danh sách phim...</option>
+          </select>
+        </div>
+
+        <!-- Chọn ngày -->
+        <div class="filter-group" style="margin-top: 15px;">
           <label>Ngày chiếu:</label>
-          <div class="date-chips">
-            <button class="chip active">Hôm nay (25/09)</button>
-            <button class="chip">Thứ Bảy (26/09)</button>
-            <button class="chip">Chủ Nhật (27/09)</button>
+          <div class="date-chips" id="dateChipsContainer">
+            <!-- Render ngày động -->
           </div>
         </div>
 
-        <div class="filter-group">
+        <!-- Chọn khung giờ & phòng chiếu -->
+        <div class="filter-group" style="margin-top: 15px;">
           <label>Khung giờ & Phòng chiếu:</label>
-          <div class="time-chips">
-            <button class="chip active">18:30 (Rạp 01 - 2D)</button>
-            <button class="chip">20:15 (Rạp 03 - IMAX)</button>
-            <button class="chip">22:00 (Rạp 02 - 3D)</button>
+          <div class="time-chips" id="timeChipsContainer">
+            <!-- Render khung giờ & phòng chiếu động -->
           </div>
         </div>
       </div>
@@ -57,7 +66,7 @@
         <!-- Màn hình chiếu -->
         <div class="screen-container">
           <div class="screen"></div>
-          <p class="screen-label">MÀN HÌNH</p>
+          <p class="screen-label">MÀN HÌNH CHIẾU</p>
         </div>
 
         <!-- Sơ đồ ghế -->
@@ -65,77 +74,77 @@
           <!-- Dãy A (Ghế thường) -->
           <div class="seat-row">
             <span class="row-label">A</span>
-            <div class="seat standard" data-seat="A1" data-price="90000">1</div>
-            <div class="seat standard" data-seat="A2" data-price="90000">2</div>
-            <div class="seat standard occupied" data-seat="A3">3</div>
-            <div class="seat standard occupied" data-seat="A4">4</div>
-            <div class="seat standard" data-seat="A5" data-price="90000">5</div>
-            <div class="seat standard" data-seat="A6" data-price="90000">6</div>
+            <div class="seat standard" data-seat="A1">1</div>
+            <div class="seat standard" data-seat="A2">2</div>
+            <div class="seat standard" data-seat="A3">3</div>
+            <div class="seat standard" data-seat="A4">4</div>
+            <div class="seat standard" data-seat="A5">5</div>
+            <div class="seat standard" data-seat="A6">6</div>
           </div>
 
           <!-- Dãy B (Ghế thường) -->
           <div class="seat-row">
             <span class="row-label">B</span>
-            <div class="seat standard" data-seat="B1" data-price="90000">1</div>
-            <div class="seat standard" data-seat="B2" data-price="90000">2</div>
-            <div class="seat standard" data-seat="B3" data-price="90000">3</div>
-            <div class="seat standard" data-seat="B4" data-price="90000">4</div>
-            <div class="seat standard" data-seat="B5" data-price="90000">5</div>
-            <div class="seat standard" data-seat="B6" data-price="90000">6</div>
+            <div class="seat standard" data-seat="B1">1</div>
+            <div class="seat standard" data-seat="B2">2</div>
+            <div class="seat standard" data-seat="B3">3</div>
+            <div class="seat standard" data-seat="B4">4</div>
+            <div class="seat standard" data-seat="B5">5</div>
+            <div class="seat standard" data-seat="B6">6</div>
           </div>
 
           <!-- Dãy C (Ghế VIP) -->
           <div class="seat-row">
             <span class="row-label">C</span>
-            <div class="seat vip" data-seat="C1" data-price="120000">1</div>
-            <div class="seat vip" data-seat="C2" data-price="120000">2</div>
-            <div class="seat vip occupied" data-seat="C3">3</div>
-            <div class="seat vip" data-seat="C4" data-price="120000">4</div>
-            <div class="seat vip" data-seat="C5" data-price="120000">5</div>
-            <div class="seat vip" data-seat="C6" data-price="120000">6</div>
+            <div class="seat vip" data-seat="C1">1</div>
+            <div class="seat vip" data-seat="C2">2</div>
+            <div class="seat vip" data-seat="C3">3</div>
+            <div class="seat vip" data-seat="C4">4</div>
+            <div class="seat vip" data-seat="C5">5</div>
+            <div class="seat vip" data-seat="C6">6</div>
           </div>
 
           <!-- Dãy D (Ghế VIP) -->
           <div class="seat-row">
             <span class="row-label">D</span>
-            <div class="seat vip" data-seat="D1" data-price="120000">1</div>
-            <div class="seat vip" data-seat="D2" data-price="120000">2</div>
-            <div class="seat vip" data-seat="D3" data-price="120000">3</div>
-            <div class="seat vip" data-seat="D4" data-price="120000">4</div>
-            <div class="seat vip" data-seat="D5" data-price="120000">5</div>
-            <div class="seat vip" data-seat="D6" data-price="120000">6</div>
+            <div class="seat vip" data-seat="D1">1</div>
+            <div class="seat vip" data-seat="D2">2</div>
+            <div class="seat vip" data-seat="D3">3</div>
+            <div class="seat vip" data-seat="D4">4</div>
+            <div class="seat vip" data-seat="D5">5</div>
+            <div class="seat vip" data-seat="D6">6</div>
           </div>
         </div>
 
         <!-- Chú thích loại ghế -->
         <div class="seat-legend">
-          <div class="legend-item"><span class="seat-sample standard"></span> Ghế Thường (90k)</div>
-          <div class="legend-item"><span class="seat-sample vip"></span> Ghế VIP (120k)</div>
+          <div class="legend-item"><span class="seat-sample standard"></span> Ghế Thường (<span id="priceStandardLabel">90k</span>)</div>
+          <div class="legend-item"><span class="seat-sample vip"></span> Ghế VIP (<span id="priceVipLabel">120k</span>)</div>
           <div class="legend-item"><span class="seat-sample selected"></span> Ghế Đang Chọn</div>
           <div class="legend-item"><span class="seat-sample occupied"></span> Đã Có Người</div>
         </div>
       </div>
     </div>
 
-    <!-- Cột bên phải: Tóm tắt vé & Thanh toán -->
+    <!-- Cột bên phải: Tóm tắt vé & Xác nhận -->
     <aside class="booking-summary-sidebar">
       <div class="summary-card">
         <h3>Thông Tin Đặt Vé</h3>
         
         <div class="movie-brief">
-          <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&auto=format&fit=crop" class="movie-poster-sm" alt="Poster">
+          <img id="summaryPoster" src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&auto=format&fit=crop" class="movie-poster-sm" alt="Poster">
           <div>
-            <h4 id="summaryTitle">Vũ Trụ Vô Tận: Khởi Nguyên</h4>
-            <p class="text-muted">Hành động, Giả tưởng</p>
-            <p class="text-muted">135 phút</p>
+            <h4 id="summaryTitle">Đang tải tên phim...</h4>
+            <p class="text-muted" id="summaryCategory">Thể loại: Đang tải...</p>
+            <p class="text-muted" id="summaryDuration">Thời lượng: 120 phút</p>
           </div>
         </div>
 
         <hr class="divider">
 
         <div class="summary-details">
-          <p><strong>Rạp:</strong> CineMax Quận 1 - Rạp 03 (IMAX)</p>
-          <p><strong>Suất:</strong> 20:15 - Thứ Sáu, 25/09/2026</p>
+          <p><strong>Phòng chiếu:</strong> <span id="summaryCinemaRoom" style="color:#fff;">Chưa chọn</span></p>
+          <p><strong>Suất chiếu:</strong> <span id="summaryShowtime" style="color:#fff;">Chưa chọn</span></p>
           <p><strong>Ghế đã chọn:</strong> <span id="selectedSeatsList" class="highlight-text">Chưa chọn</span></p>
         </div>
 
@@ -152,37 +161,375 @@
 
   </div>
 
-  <!-- Script xử lý chọn ghế và tính tiền tự động -->
+  <!-- Nạp file module API kết nối Backend & Gateway -->
+  <script src="api.js"></script>
+
   <script>
-    const seatGrid = document.getElementById('seatGrid');
-    const selectedSeatsList = document.getElementById('selectedSeatsList');
-    const totalPriceEl = document.getElementById('totalPrice');
-    const btnConfirm = document.getElementById('btnConfirmBooking');
-
+    // Trạng thái hiện tại
+    let allMovies = [];
+    let currentMovie = null;
+    let movieShowtimes = [];
+    let selectedDateKey = "";
+    let currentShowtime = null;
     let selectedSeats = [];
+    let bookedSeatsList = [];
 
-    seatGrid.addEventListener('click', (e) => {
-      const target = e.target;
-      // Chỉ nhận click vào ghế chưa bị đặt
-      if (target.classList.contains('seat') && !target.classList.contains('occupied')) {
-        const seatCode = target.getAttribute('data-seat');
-        const price = parseInt(target.getAttribute('data-price'));
+    // Giá mặc định
+    let baseTicketPrice = 90000;
+    let vipTicketPrice = 120000;
 
-        target.classList.toggle('selected');
+    document.addEventListener("DOMContentLoaded", async () => {
+      // 1. Lấy movieId từ URL query string
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlMovieId = urlParams.get('movieId');
 
-        if (target.classList.contains('selected')) {
-          selectedSeats.push({ code: seatCode, price: price });
-        } else {
-          selectedSeats = selectedSeats.filter(s => s.code !== seatCode);
-        }
+      // 2. Tải danh sách phim từ Backend
+      await loadMovies(urlMovieId);
 
-        updateSummary();
-      }
+      // 3. Đăng ký sự kiện click chọn ghế
+      setupSeatEvents();
     });
 
+    /* ==========================================================
+       1. TẢI VÀ CHỌN PHIM
+    ========================================================== */
+    async function loadMovies(targetMovieId) {
+      try {
+        const res = await apiGetMovies();
+
+        if (res.ok && res.data && res.data.data && res.data.data.length > 0) {
+          allMovies = res.data.data;
+        } else {
+          // Dữ liệu dự phòng nếu chưa có phim trong database
+          allMovies = [
+            {
+              movieId: 1,
+              title: "Vũ Trụ Vô Tận: Khởi Nguyên",
+              category: "Hành động, Giả tưởng",
+              duration: 135,
+              poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=200&auto=format&fit=crop"
+            },
+            {
+              movieId: 2,
+              title: "Bóng Đêm Thức Tỉnh",
+              category: "Hành động, Phiêu lưu",
+              duration: 120,
+              poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200&auto=format&fit=crop"
+            },
+            {
+              movieId: 3,
+              title: "Hành Trình Kỳ Ảo",
+              category: "Hoạt hình, Gia đình",
+              duration: 95,
+              poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200&auto=format&fit=crop"
+            }
+          ];
+        }
+
+        // Đổ danh sách vào Dropdown
+        const selectEl = document.getElementById("selectMovie");
+        selectEl.innerHTML = "";
+        allMovies.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.movieId;
+          opt.innerText = `${m.title} (${m.category || 'Chiếu rạp'})`;
+          selectEl.appendChild(opt);
+        });
+
+        // Xác định phim được chọn
+        let selectedId = targetMovieId ? parseInt(targetMovieId) : allMovies[0].movieId;
+        const found = allMovies.find(m => m.movieId === selectedId);
+        if (found) {
+          selectEl.value = selectedId;
+          await selectMovie(found);
+        } else {
+          selectEl.value = allMovies[0].movieId;
+          await selectMovie(allMovies[0]);
+        }
+
+      } catch (err) {
+        console.error("Lỗi tải phim:", err);
+      }
+    }
+
+    async function onMovieChange(movieId) {
+      const found = allMovies.find(m => m.movieId == movieId);
+      if (found) {
+        // Cập nhật URL mà không reload trang
+        const newUrl = `${window.location.pathname}?movieId=${found.movieId}`;
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        await selectMovie(found);
+      }
+    }
+
+    async function selectMovie(movie) {
+      currentMovie = movie;
+
+      // Cập nhật thông tin phim lên giao diện tóm tắt
+      document.getElementById("summaryTitle").innerText = movie.title;
+      document.getElementById("summaryCategory").innerText = `Thể loại: ${movie.category || 'Phim Chiếu Rạp'}`;
+      document.getElementById("summaryDuration").innerText = `Thời lượng: ${movie.duration || 120} phút`;
+      if (movie.poster) {
+        document.getElementById("summaryPoster").src = movie.poster;
+      }
+
+      // Reset ghế đã chọn
+      selectedSeats = [];
+      updateSummary();
+
+      // Tải danh sách suất chiếu của phim này
+      await loadShowtimes(movie.movieId);
+    }
+
+    /* ==========================================================
+       2. TẢI VÀ HIỂN THỊ PHÒNG CHIẾU, SUẤT CHIẾU
+    ========================================================== */
+    async function loadShowtimes(movieId) {
+      const dateContainer = document.getElementById("dateChipsContainer");
+      const timeContainer = document.getElementById("timeChipsContainer");
+      dateContainer.innerHTML = '<span style="color:#888; font-size:13px;">Đang tải suất chiếu...</span>';
+      timeContainer.innerHTML = '';
+
+      try {
+        const res = await apiGetShowtimesByMovie(movieId);
+        let showtimes = [];
+
+        if (res.ok && res.data && res.data.data && res.data.data.length > 0) {
+          showtimes = res.data.data;
+        } else {
+          // Tạo suất chiếu mẫu thực tế nếu cơ sở dữ liệu chưa có suất chiếu cho phim này
+          const today = new Date();
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const dayAfter = new Date(today);
+          dayAfter.setDate(dayAfter.getDate() + 2);
+
+          showtimes = [
+            {
+              showtimeId: 101,
+              movieId: movieId,
+              cinemaRoom: "Rạp 01 (2D)",
+              startTime: new Date(today.setHours(18, 30, 0)).toISOString(),
+              ticketPrice: 90000
+            },
+            {
+              showtimeId: 102,
+              movieId: movieId,
+              cinemaRoom: "Rạp 03 (IMAX)",
+              startTime: new Date(today.setHours(20, 15, 0)).toISOString(),
+              ticketPrice: 120000
+            },
+            {
+              showtimeId: 103,
+              movieId: movieId,
+              cinemaRoom: "Rạp 02 (3D)",
+              startTime: new Date(today.setHours(22, 0, 0)).toISOString(),
+              ticketPrice: 100000
+            },
+            {
+              showtimeId: 201,
+              movieId: movieId,
+              cinemaRoom: "Rạp 01 (2D)",
+              startTime: new Date(tomorrow.setHours(19, 0, 0)).toISOString(),
+              ticketPrice: 90000
+            },
+            {
+              showtimeId: 202,
+              movieId: movieId,
+              cinemaRoom: "Rạp 03 (IMAX)",
+              startTime: new Date(tomorrow.setHours(21, 30, 0)).toISOString(),
+              ticketPrice: 120000
+            },
+            {
+              showtimeId: 301,
+              movieId: movieId,
+              cinemaRoom: "Rạp 02 (3D)",
+              startTime: new Date(dayAfter.setHours(17, 30, 0)).toISOString(),
+              ticketPrice: 100000
+            }
+          ];
+        }
+
+        movieShowtimes = showtimes;
+        renderDatesAndTimes(showtimes);
+
+      } catch (err) {
+        console.error("Lỗi lấy suất chiếu:", err);
+      }
+    }
+
+    function renderDatesAndTimes(showtimes) {
+      const dateContainer = document.getElementById("dateChipsContainer");
+      dateContainer.innerHTML = "";
+
+      // Gom nhóm suất chiếu theo ngày YYYY-MM-DD
+      const dateMap = {};
+      showtimes.forEach(st => {
+        const d = new Date(st.startTime);
+        const dateKey = d.toISOString().split('T')[0];
+        if (!dateMap[dateKey]) {
+          dateMap[dateKey] = [];
+        }
+        dateMap[dateKey].push(st);
+      });
+
+      const dateKeys = Object.keys(dateMap);
+      if (dateKeys.length === 0) {
+        dateContainer.innerHTML = '<span style="color:#aaa; font-size:13px;">Chưa có lịch chiếu cho phim này.</span>';
+        document.getElementById("timeChipsContainer").innerHTML = '';
+        return;
+      }
+
+      // Render các nút chọn Ngày (Date Chips)
+      dateKeys.forEach((key, index) => {
+        const d = new Date(key);
+        const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        const dayStr = dayNames[d.getDay()];
+        const formattedDate = `${d.getDate()}/${d.getMonth() + 1}`;
+
+        const isToday = new Date().toISOString().split('T')[0] === key;
+        const label = isToday ? `Hôm nay (${formattedDate})` : `${dayStr} (${formattedDate})`;
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = `chip ${index === 0 ? 'active' : ''}`;
+        chip.innerText = label;
+        chip.onclick = () => {
+          document.querySelectorAll("#dateChipsContainer .chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          selectedDateKey = key;
+          renderTimesForDate(dateMap[key]);
+        };
+
+        dateContainer.appendChild(chip);
+      });
+
+      // Chọn ngày đầu tiên làm mặc định
+      selectedDateKey = dateKeys[0];
+      renderTimesForDate(dateMap[selectedDateKey]);
+    }
+
+    function renderTimesForDate(showtimes) {
+      const timeContainer = document.getElementById("timeChipsContainer");
+      timeContainer.innerHTML = "";
+
+      if (!showtimes || showtimes.length === 0) {
+        timeContainer.innerHTML = '<span style="color:#888; font-size:13px;">Không có suất chiếu trong ngày này.</span>';
+        return;
+      }
+
+      showtimes.forEach((st, index) => {
+        const d = new Date(st.startTime);
+        const timeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        const roomName = st.cinemaRoom || "Rạp 01";
+
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = `chip ${index === 0 ? 'active' : ''}`;
+        chip.innerText = `${timeStr} (${roomName})`;
+        chip.onclick = () => {
+          document.querySelectorAll("#timeChipsContainer .chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          selectShowtime(st);
+        };
+
+        timeContainer.appendChild(chip);
+      });
+
+      // Chọn suất chiếu đầu tiên
+      selectShowtime(showtimes[0]);
+    }
+
+    async function selectShowtime(st) {
+      currentShowtime = st;
+
+      // Cập nhật giá vé gốc theo phim hoặc suất chiếu
+      if (currentMovie && currentMovie.priceStandard) {
+        baseTicketPrice = parseFloat(currentMovie.priceStandard);
+        vipTicketPrice = currentMovie.priceVip ? parseFloat(currentMovie.priceVip) : (baseTicketPrice + 30000);
+      } else {
+        baseTicketPrice = st.ticketPrice ? parseFloat(st.ticketPrice) : 90000;
+        vipTicketPrice = baseTicketPrice + 30000;
+      }
+
+      document.getElementById("priceStandardLabel").innerText = `${(baseTicketPrice / 1000)}k`;
+      document.getElementById("priceVipLabel").innerText = `${(vipTicketPrice / 1000)}k`;
+
+      // Định dạng ngày giờ hiển thị
+      const d = new Date(st.startTime);
+      const dayNames = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+      const displayTime = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')} - ${dayNames[d.getDay()]}, ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      st.displayTime = displayTime;
+
+      // Cập nhật thông tin phòng chiếu và suất chiếu lên tóm tắt
+      document.getElementById("summaryCinemaRoom").innerText = st.cinemaRoom || "Rạp 01 (2D)";
+      document.getElementById("summaryShowtime").innerText = displayTime;
+
+      // Reset ghế đã chọn khi đổi suất
+      selectedSeats = [];
+      updateSummary();
+
+      // Lấy danh sách ghế đã đặt từ API Backend
+      await fetchBookedSeats(st.movieId, st.cinemaRoom, st.startTime);
+    }
+
+    /* ==========================================================
+       3. LẤY GHẾ ĐÃ ĐẶT VÀ QUẢN LÝ SƠ ĐỒ GHẾ
+    ========================================================== */
+    async function fetchBookedSeats(movieId, cinemaRoom, showtime) {
+      bookedSeatsList = [];
+      try {
+        const res = await apiGetBookedSeats(movieId, cinemaRoom, showtime);
+        if (res.ok && res.data && res.data.data) {
+          bookedSeatsList = res.data.data;
+        }
+      } catch (err) {
+        console.warn("Lỗi lấy ghế đã đặt:", err);
+      }
+
+      // Cập nhật lại trạng thái occupied của các ghế trên sơ đồ
+      const allSeatElements = document.querySelectorAll("#seatGrid .seat");
+      allSeatElements.forEach(el => {
+        const seatCode = el.getAttribute("data-seat");
+        el.classList.remove("selected");
+
+        if (bookedSeatsList.includes(seatCode)) {
+          el.classList.add("occupied");
+        } else {
+          el.classList.remove("occupied");
+        }
+      });
+    }
+
+    function setupSeatEvents() {
+      const seatGrid = document.getElementById('seatGrid');
+
+      seatGrid.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.classList.contains('seat') && !target.classList.contains('occupied')) {
+          const seatCode = target.getAttribute('data-seat');
+          const isVip = target.classList.contains('vip');
+          const price = isVip ? vipTicketPrice : baseTicketPrice;
+
+          target.classList.toggle('selected');
+
+          if (target.classList.contains('selected')) {
+            selectedSeats.push({ code: seatCode, price: price, type: isVip ? "VIP" : "Standard" });
+          } else {
+            selectedSeats = selectedSeats.filter(s => s.code !== seatCode);
+          }
+
+          updateSummary();
+        }
+      });
+    }
+
     function updateSummary() {
+      const selectedSeatsListEl = document.getElementById('selectedSeatsList');
+      const totalPriceEl = document.getElementById('totalPrice');
+
       if (selectedSeats.length === 0) {
-        selectedSeatsList.innerText = "Chưa chọn";
+        selectedSeatsListEl.innerText = "Chưa chọn";
         totalPriceEl.innerText = "0 đ";
         return;
       }
@@ -190,31 +537,50 @@
       const seatCodes = selectedSeats.map(s => s.code).join(', ');
       const total = selectedSeats.reduce((sum, s) => sum + s.price, 0);
 
-      selectedSeatsList.innerText = seatCodes;
+      selectedSeatsListEl.innerText = seatCodes;
       totalPriceEl.innerText = total.toLocaleString('vi-VN') + " đ";
     }
 
-    btnConfirm.addEventListener('click', () => {
+    /* ==========================================================
+       4. XÁC NHẬN THANH TOÁN
+    ========================================================== */
+    document.getElementById('btnConfirmBooking').addEventListener('click', () => {
       if (selectedSeats.length === 0) {
-        alert("Vui lòng chọn ít nhất một ghế ngồi!");
+        alert("Vui lòng chọn ít nhất một ghế ngồi để tiếp tục!");
         return;
       }
 
-      // 1. Gom dữ liệu đặt vé tạm thời
+      if (!currentMovie || !currentShowtime) {
+        alert("Vui lòng chọn đầy đủ phim, phòng chiếu và suất chiếu!");
+        return;
+      }
+
+      // Xác định loại vé (IMAX, 3D hoặc 2D)
+      let ticketType = "2D";
+      if (currentShowtime.cinemaRoom.includes("IMAX")) ticketType = "IMAX";
+      else if (currentShowtime.cinemaRoom.includes("3D")) ticketType = "3D";
+
+      // Gom toàn bộ thông tin đặt vé đầy đủ
       const bookingData = {
-        movieTitle: document.getElementById('summaryTitle').innerText,
-        cinemaRoom: "CineMax Quận 1 - Rạp 03 (IMAX)",
-        showtime: "20:15 - Thứ Sáu, 25/09/2026",
+        movieId: currentMovie.movieId,
+        movieTitle: currentMovie.title,
+        poster: currentMovie.poster,
+        showtimeId: currentShowtime.showtimeId,
+        cinemaRoom: currentShowtime.cinemaRoom,
+        showtime: currentShowtime.displayTime,
+        showtimeIso: currentShowtime.startTime,
+        ticketType: ticketType,
         seats: selectedSeats.map(s => s.code).join(', '),
         totalPrice: selectedSeats.reduce((sum, s) => sum + s.price, 0)
       };
 
-      // 2. Lưu vào sessionStorage để trang payment.html đọc được
+      // Lưu vào sessionStorage để trang payment.html lấy dữ liệu
       sessionStorage.setItem('currentBooking', JSON.stringify(bookingData));
 
-      // 3. Chuyển sang trang thanh toán
+      // Chuyển sang trang thanh toán
       window.location.href = "payment.html";
     });
   </script>
+
 </body>
 </html>

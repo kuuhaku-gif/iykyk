@@ -16,26 +16,31 @@
   <main class="auth-container">
     <div class="auth-card">
       <h2>Đăng Nhập</h2>
-      <form class="auth-form" action="#" method="POST">
+
+      <!-- Hộp thông báo lỗi/thành công -->
+      <div id="loginAlert"></div>
+
+      <form class="auth-form" id="formLogin" onsubmit="handleLogin(event)">
         
         <div class="form-group">
-          <label for="email">Email hoặc Số điện thoại</label>
-          <input type="text" id="email" name="email" placeholder="Nhập email hoặc số điện thoại" required>
+          <label for="email">Địa chỉ Email</label>
+          <input type="email" id="email" name="email" placeholder="Nhập địa chỉ email" required autocomplete="email">
         </div>
 
         <div class="form-group">
           <label for="password">Mật khẩu</label>
-          <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+          <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
         </div>
 
         <div class="form-options">
           <label class="remember-me">
-            <input type="checkbox" name="remember"> Ghi nhớ đăng nhập
+            <input type="checkbox" id="rememberMe" name="remember"> Ghi nhớ đăng nhập
           </label>
-          <a href="#" class="forgot-link">Quên mật khẩu?</a>
+          <!-- Liên kết dẫn đến trang Quên mật khẩu / Xác thực OTP -->
+          <a href="reset-password.html" class="forgot-link">Quên mật khẩu?</a>
         </div>
 
-        <button type="submit" class="btn-primary btn-full">Đăng Nhập</button>
+        <button type="submit" id="btnLogin" class="btn-primary btn-full">Đăng Nhập</button>
       </form>
 
       <div class="auth-footer">
@@ -44,6 +49,73 @@
       </div>
     </div>
   </main>
+
+  <!-- Kết nối API Backend & Gateway -->
+  <script src="api.js"></script>
+
+  <script>
+    // Nếu đã đăng nhập với quyền Admin thì tự động chuyển luôn sang trang admin
+    document.addEventListener("DOMContentLoaded", () => {
+      if (isLoggedIn()) {
+        const user = getCurrentUser();
+        const role = (user?.role || user?.Role || "").trim().toLowerCase();
+        if (role === "admin") {
+          window.location.href = "admin.html";
+        }
+      }
+    });
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      clearAlert("loginAlert");
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const btn = document.getElementById("btnLogin");
+
+      if (!email || !password) {
+        showAlert("loginAlert", "Vui lòng nhập đầy đủ Email và Mật khẩu!", "danger");
+        return;
+      }
+
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+
+      try {
+        const res = await apiLogin(email, password);
+
+        if (res.ok && res.data && res.data.success) {
+          const user = res.data.data;
+          // Lưu Token và Thông tin người dùng vào LocalStorage
+          saveAuth(res.data.token, user);
+
+          // Kiểm tra quyền Admin (không phân biệt hoa/thường)
+          const userRole = (user?.role || user?.Role || "").trim().toLowerCase();
+
+          if (userRole === "admin") {
+            showAlert("loginAlert", "Đăng nhập quyền Quản trị viên thành công! Đang chuyển đến trang Admin...", "success");
+            setTimeout(() => {
+              window.location.href = "admin.html";
+            }, 700);
+          } else {
+            showAlert("loginAlert", "Đăng nhập thành công! Đang chuyển về trang chủ...", "success");
+            setTimeout(() => {
+              window.location.href = "Trangchu.html";
+            }, 700);
+          }
+
+        } else {
+          const msg = res.data?.message || "Email hoặc mật khẩu không chính xác!";
+          showAlert("loginAlert", msg, "danger");
+        }
+      } catch (err) {
+        showAlert("loginAlert", "Lỗi kết nối máy chủ khi đăng nhập!", "danger");
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    }
+  </script>
 
 </body>
 </html>

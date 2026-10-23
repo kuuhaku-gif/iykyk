@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMax - Thanh Toán Vé</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="navbar">
+    <div class="logo"><a href="Trangchu.html">Cikipdy<span>Max</span></a></div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="Trangchu.html">Trang Chủ</a></li>
+        <li><a href="booking.html">Chọn Ghế Lại</a></li>
+        <li><a href="profile.html">Vé Của Tôi</a></li>
+      </ul>
+    </nav>
+    <div class="user-menu" id="headerAuthContainer">
+      <a href="login.html" class="btn-primary">Đăng Nhập</a>
+    </div>
+  </header>
+
+  <!-- Payment Layout -->
+  <div class="payment-container">
+    
+    <!-- Cột bên trái: Chọn phương thức thanh toán -->
+    <div class="payment-methods-section">
+      <div class="countdown-box">
+        ⏳ Thời gian giữ vé còn lại: <strong id="countdown">10:00</strong>
+      </div>
+
+      <h3>Chọn Phương Thức Thanh Toán</h3>
+
+      <div class="method-list">
+        <!-- Ví điện tử MoMo -->
+        <label class="method-card">
+          <input type="radio" name="paymentMethod" value="momo" checked>
+          <div class="method-info">
+            <span class="method-icon">📱</span>
+            <div>
+              <strong>Ví MoMo</strong>
+              <p>Quét mã QR qua ứng dụng MoMo</p>
+            </div>
+          </div>
+        </label>
+
+        <!-- Chuyển khoản QR Ngân hàng (VietQR) -->
+        <label class="method-card">
+          <input type="radio" name="paymentMethod" value="vietqr">
+          <div class="method-info">
+            <span class="method-icon">🏦</span>
+            <div>
+              <strong>Chuyển khoản Ngân hàng (VietQR)</strong>
+              <p>Quét mã bằng bất kỳ ứng dụng ngân hàng nào</p>
+            </div>
+          </div>
+        </label>
+
+        <!-- Thẻ tín dụng / Ghi nợ Quốc tế -->
+        <label class="method-card">
+          <input type="radio" name="paymentMethod" value="card">
+          <div class="method-info">
+            <span class="method-icon">💳</span>
+            <div>
+              <strong>Thẻ Quốc Tế (Visa, Master, JCB)</strong>
+              <p>Hỗ trợ thẻ phát hành trong & ngoài nước</p>
+            </div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Khu vực hiển thị mã QR giả lập -->
+      <div class="qr-preview-box" id="qrSection">
+        <h4>Quét mã để thanh toán</h4>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=CineMax_Payment_Simulation" alt="QR Code" class="qr-code-img">
+        <p class="qr-note">Vui lòng mở ứng dụng ví/ngân hàng và quét mã để hoàn tất</p>
+      </div>
+    </div>
+
+    <!-- Cột bên phải: Tóm tắt đơn hàng thanh toán -->
+    <aside class="payment-summary-sidebar">
+      <div class="summary-card">
+        <h3>Chi Tiết Đơn Hàng</h3>
+
+        <div class="summary-details">
+          <p><strong>Phim:</strong> <span id="payMovieTitle">Vũ Trụ Vô Tận: Khởi Nguyên</span></p>
+          <p><strong>Rạp:</strong> <span id="payCinemaRoom">CineMax Quận 1 - Rạp 03 (IMAX)</span></p>
+          <p><strong>Suất chiếu:</strong> <span id="payShowtime">20:15 - Thứ Sáu, 25/09/2026</span></p>
+          <p><strong>Ghế đã chọn:</strong> <span id="paySeats" class="highlight-text">C1, C2</span></p>
+        </div>
+
+        <hr class="divider">
+
+        <div class="summary-total">
+          <span>Tổng thanh toán:</span>
+          <span class="total-price" id="payTotalPrice">240.000 đ</span>
+        </div>
+
+        <button class="btn-primary btn-full mt-20" id="btnCompletePayment">Tôi Đã Thanh Toán Thành Công</button>
+        <a href="booking.html" class="btn-back">⬅ Quay lại đổi ghế</a>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Nạp file kết nối API -->
+  <script src="api.js"></script>
+
+  <script>
+    let currentBookingData = null;
+
+    // 1. Đọc dữ liệu từ booking.html sang
+    const storedBooking = sessionStorage.getItem('currentBooking');
+    if (storedBooking) {
+      currentBookingData = JSON.parse(storedBooking);
+      document.getElementById('payMovieTitle').innerText = currentBookingData.movieTitle || "Chưa rõ";
+      document.getElementById('payCinemaRoom').innerText = currentBookingData.cinemaRoom || "Chưa rõ";
+      document.getElementById('payShowtime').innerText = currentBookingData.showtime || "Chưa rõ";
+      document.getElementById('paySeats').innerText = currentBookingData.seats || "Chưa rõ";
+      document.getElementById('payTotalPrice').innerText = (currentBookingData.totalPrice || 0).toLocaleString('vi-VN') + " đ";
+    } else {
+      alert("Không tìm thấy thông tin đặt vé! Đang quay lại trang chọn phim.");
+      window.location.href = "booking.html";
+    }
+
+    // 2. Đồng hồ đếm ngược giữ vé 10 phút
+    let timeLeft = 600; // 10 phút = 600 giây
+    const countdownEl = document.getElementById('countdown');
+
+    const timer = setInterval(() => {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      countdownEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        alert("Đã hết thời gian giữ vé! Vui lòng chọn lại suất chiếu.");
+        window.location.href = "booking.html";
+      }
+      timeLeft--;
+    }, 1000);
+
+    // 3. Hoàn tất thanh toán -> Gọi API Backend lưu vé và chuyển sang Profile
+    document.getElementById('btnCompletePayment').addEventListener('click', async () => {
+      const btn = document.getElementById('btnCompletePayment');
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+      btn.innerText = "⏳ Đang xử lý thanh toán...";
+
+      const user = getCurrentUser();
+
+      // Nếu chưa đăng nhập, yêu cầu đăng nhập trước
+      if (!user || !user.userId) {
+        alert("⚠️ Bạn cần đăng nhập để hoàn tất thanh toán!\nHệ thống sẽ chuyển bạn đến trang đăng nhập.");
+        // Lưu lại booking data để sau khi đăng nhập quay lại
+        window.location.href = "login.html";
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+        btn.innerText = "Tôi Đã Thanh Toán Thành Công";
+        return;
+      }
+
+      // Chuẩn bị payload vé gửi lên Backend API
+      const ticketPayload = {
+        userId: user.userId,
+        movieId: currentBookingData.movieId || 1,
+        movieTitle: currentBookingData.movieTitle || "",
+        cinemaRoom: currentBookingData.cinemaRoom || "",
+        showtime: currentBookingData.showtimeIso || new Date().toISOString(),
+        ticketType: currentBookingData.ticketType || "2D",
+        seats: currentBookingData.seats || "",
+        price: currentBookingData.totalPrice || 0,
+        status: "upcoming"
+      };
+
+      try {
+        const res = await apiBookTicket(ticketPayload);
+
+        if (res.ok && res.data && res.data.success) {
+          // ✅ Đặt vé thành công - Backend đã lưu vào CSDL
+          const code = res.data.ticketCode || "TK-" + Date.now();
+          clearInterval(timer); // Dừng đồng hồ đếm ngược
+
+          // Xoá dữ liệu booking tạm
+          sessionStorage.removeItem('currentBooking');
+
+          // Thông báo thành công
+          alert(
+            `🎉 ĐẶT VÉ THÀNH CÔNG!\n\n` +
+            `📋 Mã vé: #${code}\n` +
+            `🎬 Phim: ${currentBookingData.movieTitle}\n` +
+            `🏠 Rạp: ${currentBookingData.cinemaRoom}\n` +
+            `💺 Ghế: ${currentBookingData.seats}\n` +
+            `💰 Tổng tiền: ${(currentBookingData.totalPrice || 0).toLocaleString('vi-VN')} đ\n\n` +
+            `Vé đã được lưu vào tài khoản của bạn.\nChuyển đến trang "Vé Của Tôi" để xem chi tiết.`
+          );
+
+          // Chuyển sang trang cá nhân để xem vé mới đặt
+          window.location.href = "profile.html";
+        } else {
+          // Backend trả lỗi (ghế đã bị đặt, user không tồn tại, v.v.)
+          const errMsg = res.data?.message || "Không thể đặt vé. Vui lòng thử lại!";
+          alert("❌ " + errMsg);
+          btn.innerText = "Tôi Đã Thanh Toán Thành Công";
+        }
+      } catch (err) {
+        console.error("Lỗi đặt vé:", err);
+        alert("❌ Lỗi kết nối đến máy chủ! Vui lòng kiểm tra kết nối và thử lại.");
+        btn.innerText = "Tôi Đã Thanh Toán Thành Công";
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+</html>
