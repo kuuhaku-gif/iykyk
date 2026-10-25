@@ -157,7 +157,7 @@
       if (!user || !user.userId) {
         alert("⚠️ Bạn cần đăng nhập để hoàn tất thanh toán!\nHệ thống sẽ chuyển bạn đến trang đăng nhập.");
         // Lưu lại booking data để sau khi đăng nhập quay lại
-        window.location.href = "login.html";
+        window.location.href = "login.html?redirect=payment.html";
         btn.classList.remove("btn-loading");
         btn.disabled = false;
         btn.innerText = "Tôi Đã Thanh Toán Thành Công";

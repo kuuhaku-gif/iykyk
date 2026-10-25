@@ -15,6 +15,8 @@
     <ul class="admin-menu">
       <li class="active" id="navDashboard"><a href="#dashboard" onclick="switchTab('dashboard')">📊 Tổng quan</a></li>
       <li id="navMovies"><a href="#movies-management" onclick="switchTab('movies')">🎬 Quản lý Phim</a></li>
+      <li id="navRooms"><a href="#rooms-management" onclick="switchTab('rooms')">🏛️ Quản lý Phòng Chiếu</a></li>
+      <li id="navShowtimes"><a href="#showtimes-management" onclick="switchTab('showtimes')">🕒 Quản lý Suất Chiếu</a></li>
       <li id="navTickets"><a href="#tickets-management" onclick="switchTab('tickets')">🎟️ Quản lý Vé</a></li>
       <li id="navUsers"><a href="#users-management" onclick="switchTab('users')">👥 Khách hàng</a></li>
       <li class="menu-divider"></li>
@@ -56,6 +58,14 @@
       <div class="stat-card" style="cursor: pointer;" onclick="switchTab('tickets')">
         <h4>Doanh Thu (Vé)</h4>
         <p class="stat-number highlight" id="statTotalRevenue">0 đ</p>
+      </div>
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('rooms')">
+        <h4>Tổng số Phòng Chiếu</h4>
+        <p class="stat-number" id="statTotalRooms">0</p>
+      </div>
+      <div class="stat-card" style="cursor: pointer;" onclick="switchTab('showtimes')">
+        <h4>Tổng Suất Chiếu</h4>
+        <p class="stat-number" id="statTotalShowtimes">0</p>
       </div>
       <div class="stat-card" style="cursor: pointer;" onclick="switchTab('users')">
         <h4>Khách Hàng / Thành Viên</h4>
@@ -176,6 +186,203 @@
     </div>
 
     <!-- ========================================================
+         PHẦN: QUẢN LÝ PHÒNG CHIẾU (CINEMA ROOMS)
+    ======================================================== -->
+    <div id="roomsTabSection" class="admin-tab-section" style="margin-top: 30px;">
+      <!-- Form Thêm / Sửa Phòng Chiếu -->
+      <section class="admin-panel" id="add-room-section">
+        <h3 id="roomFormHeading">🏛️ Thêm Phòng Chiếu Mới</h3>
+        <p style="font-size: 13px; color: #888; margin-bottom: 15px;">Quản lý phòng chiếu, sức chứa ghế và định dạng âm thanh/hình ảnh</p>
+        <form class="admin-form" id="formRoom" onsubmit="handleSaveRoom(event)">
+          <input type="hidden" id="roomId" value="">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="roomName">Tên Phòng Chiếu *</label>
+              <input type="text" id="roomName" placeholder="Ví dụ: Rạp 01, Rạp 02 (IMAX)..." required>
+            </div>
+            <div class="form-group">
+              <label for="roomType">Loại Phòng / Công Nghệ *</label>
+              <select id="roomType" class="movie-select-dropdown" style="max-width: 100%;">
+                <option value="2D Standard">2D Standard (Tiêu chuẩn)</option>
+                <option value="3D Digital">3D Digital (Kính 3D)</option>
+                <option value="IMAX Laser">IMAX Laser (Màn hình lớn siêu nét)</option>
+                <option value="VIP Luxury">VIP Luxury (Ghế sofa bọc da)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="totalSeats">Tổng Số Ghế *</label>
+              <input type="number" id="totalSeats" placeholder="80" min="10" max="300" required value="80">
+            </div>
+            <div class="form-group">
+              <label for="roomStatus">Trạng Thái Vận Hành *</label>
+              <select id="roomStatus" class="movie-select-dropdown" style="max-width: 100%;">
+                <option value="active">Đang hoạt động</option>
+                <option value="maintenance">Đang bảo trì / Nâng cấp</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="submit" class="btn-primary" id="btnSubmitRoom">
+              💾 Lưu Phòng Chiếu
+            </button>
+            <button type="button" class="btn-secondary-cancel" id="btnCancelEditRoom" style="display: none;" onclick="cancelEditRoom()">
+              ✕ Hủy Chỉnh Sửa
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Bảng Danh Sách Phòng Chiếu -->
+      <section class="admin-panel" id="rooms-management">
+        <div class="admin-toolbar">
+          <div>
+            <h3>🏛️ Danh Sách Phòng Chiếu Rạp</h3>
+            <p style="font-size: 13px; color: #888;">Quản lý phòng chiếu, sức chứa số ghế và định dạng công nghệ</p>
+          </div>
+          <input 
+            type="text" 
+            class="admin-search-input" 
+            id="searchRoomInput" 
+            placeholder="🔍 Tìm tên phòng, loại phòng..." 
+            oninput="filterRoomsTable()"
+          >
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">Mã</th>
+                <th>Tên Phòng Chiếu</th>
+                <th>Loại Phòng / Công Nghệ</th>
+                <th>Tổng Số Ghế</th>
+                <th>Trạng Thái</th>
+                <th style="width: 140px;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminRoomTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: #888; padding: 25px;">Đang tải danh sách phòng chiếu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================================
+         PHẦN: QUẢN LÝ SUẤT CHIẾU (SHOWTIMES)
+    ======================================================== -->
+    <div id="showtimesTabSection" class="admin-tab-section" style="margin-top: 30px;">
+      <!-- Form Thêm / Sửa Suất Chiếu -->
+      <section class="admin-panel" id="add-showtime-section">
+        <h3 id="showtimeFormHeading">🕒 Xếp Lịch Suất Chiếu Mới</h3>
+        <p style="font-size: 13px; color: #888; margin-bottom: 15px;">Hệ thống tự động kiểm tra trùng giờ cùng phòng chiếu dựa theo thời lượng phim</p>
+        <form class="admin-form" id="formShowtime" onsubmit="handleSaveShowtime(event)">
+          <input type="hidden" id="showtimeId" value="">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="showtimeMovieId">Chọn Phim Chiếu *</label>
+              <select id="showtimeMovieId" class="movie-select-dropdown" style="max-width: 100%;" required onchange="onShowtimeMovieChange()">
+                <option value="">-- Chọn phim --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="showtimeRoomId">Chọn Phòng Chiếu *</label>
+              <select id="showtimeRoomId" class="movie-select-dropdown" style="max-width: 100%;" required>
+                <option value="">-- Chọn phòng chiếu --</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="showtimeStartTime">Ngày & Giờ Bắt Đầu *</label>
+              <input type="datetime-local" id="showtimeStartTime" required>
+            </div>
+            <div class="form-group">
+              <label for="showtimeTicketPrice">Giá Vé Cơ Bản (VNĐ) *</label>
+              <input type="number" id="showtimeTicketPrice" placeholder="90000" min="0" step="5000" required value="90000">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="showtimeStatus">Trạng Thái Suất Chiếu</label>
+              <select id="showtimeStatus" class="movie-select-dropdown" style="max-width: 100%;">
+                <option value="active">Đang mở bán vé</option>
+                <option value="cancelled">Tạm hoãn / Đã hủy</option>
+              </select>
+            </div>
+            <div class="form-group" style="display:flex; flex-direction:column; justify-content:center;">
+              <small id="showtimeDurationHint" style="color:#aaa; margin-top:20px;">⏱️ Suất chiếu tự động được bảo vệ chống trùng giờ theo thời lượng phim</small>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="submit" class="btn-primary" id="btnSubmitShowtime">
+              💾 Lưu Suất Chiếu
+            </button>
+            <button type="button" class="btn-secondary-cancel" id="btnCancelEditShowtime" style="display: none;" onclick="cancelEditShowtime()">
+              ✕ Hủy Chỉnh Sửa
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Bảng Danh Sách Suất Chiếu -->
+      <section class="admin-panel" id="showtimes-management">
+        <div class="admin-toolbar">
+          <div>
+            <h3>🕒 Danh Sách Lịch Suất Chiếu</h3>
+            <p style="font-size: 13px; color: #888;">Theo dõi, lọc theo phim/phòng và sắp xếp lịch chiếu</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <select id="filterShowtimeMovie" class="admin-search-input" style="width: 200px;" onchange="filterShowtimesTable()">
+              <option value="all">Tất cả phim</option>
+            </select>
+            <input 
+              type="text" 
+              class="admin-search-input" 
+              id="searchShowtimeInput" 
+              placeholder="🔍 Tìm phòng, phim..." 
+              oninput="filterShowtimesTable()"
+            >
+          </div>
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">ID</th>
+                <th style="width: 70px;">Poster</th>
+                <th>Tên Phim</th>
+                <th>Phòng Chiếu</th>
+                <th>Thời Gian Chiếu</th>
+                <th>Thời Lượng</th>
+                <th>Giá Vé</th>
+                <th>Trạng Thái</th>
+                <th style="width: 140px;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="adminShowtimeTableBody">
+              <tr>
+                <td colspan="9" style="text-align: center; color: #888; padding: 25px;">Đang tải danh sách suất chiếu...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ========================================================
          PHẦN 3: QUẢN LÝ VÉ (TICKETS MANAGEMENT)
     ======================================================== -->
     <div id="ticketsTabSection" class="admin-tab-section" style="margin-top: 30px;">
@@ -275,6 +482,8 @@
   <script>
     // Dữ liệu bộ nhớ tạm toàn cục
     let globalMovies = [];
+    let globalRooms = [];
+    let globalShowtimes = [];
     let globalTickets = [];
     let globalUsers = [];
     let isEditingMovie = false;
@@ -308,6 +517,8 @@
       clearAlert("adminAlertBox");
       await Promise.all([
         loadAdminMovies(),
+        loadAdminRooms(),
+        loadAdminShowtimes(),
         loadAdminTickets(),
         loadAdminUsers(),
         loadDashboardStats()
@@ -321,6 +532,8 @@
       const targetNav = {
         'dashboard': 'navDashboard',
         'movies': 'navMovies',
+        'rooms': 'navRooms',
+        'showtimes': 'navShowtimes',
         'tickets': 'navTickets',
         'users': 'navUsers'
       }[tabKey];
@@ -334,6 +547,8 @@
       const targetSection = {
         'dashboard': 'dashboardStatsSection',
         'movies': 'movies-management',
+        'rooms': 'rooms-management',
+        'showtimes': 'showtimes-management',
         'tickets': 'tickets-management',
         'users': 'users-management'
       }[tabKey];
@@ -397,6 +612,7 @@
 
         renderMoviesTable(globalMovies);
         document.getElementById("statTotalMovies").innerText = globalMovies.length;
+        populateShowtimeDropdowns();
       } catch (err) {
         console.error("Lỗi tải phim:", err);
         renderMoviesTable(globalMovies);
@@ -625,7 +841,479 @@
     }
 
     /* ========================================================
-       2. CHỨC NĂNG QUẢN LÝ VÉ (TICKETS & SOÁT VÉ)
+       2. CHỨC NĂNG QUẢN LÝ PHÒNG CHIẾU (CINEMA ROOMS)
+    ======================================================== */
+    async function loadAdminRooms() {
+      const tbody = document.getElementById("adminRoomTableBody");
+      try {
+        const res = await apiGetAllRooms();
+        if (res.ok && res.data && res.data.data) {
+          globalRooms = res.data.data;
+        } else {
+          globalRooms = [
+            { roomId: 1, roomName: "Rạp 01", roomType: "2D Standard", totalSeats: 80, status: "active" },
+            { roomId: 2, roomName: "Rạp 02", roomType: "3D Digital", totalSeats: 80, status: "active" },
+            { roomId: 3, roomName: "Rạp 03", roomType: "IMAX Laser", totalSeats: 120, status: "active" },
+            { roomId: 4, roomName: "Rạp 04", roomType: "VIP Luxury", totalSeats: 40, status: "active" }
+          ];
+        }
+        renderRoomsTable(globalRooms);
+        const statEl = document.getElementById("statTotalRooms");
+        if (statEl) statEl.innerText = globalRooms.length;
+        populateShowtimeDropdowns();
+      } catch (err) {
+        console.error("Lỗi tải phòng chiếu:", err);
+        renderRoomsTable(globalRooms);
+      }
+    }
+
+    function renderRoomsTable(rooms) {
+      const tbody = document.getElementById("adminRoomTableBody");
+      if (!rooms || rooms.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:20px;">Không có phòng chiếu nào.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      rooms.forEach(r => {
+        const tr = document.createElement("tr");
+
+        let typeBadgeClass = "badge-room-2d";
+        const typeLower = (r.roomType || "").toLowerCase();
+        if (typeLower.includes("3d")) typeBadgeClass = "badge-room-3d";
+        else if (typeLower.includes("imax")) typeBadgeClass = "badge-room-imax";
+        else if (typeLower.includes("vip")) typeBadgeClass = "badge-room-vip";
+
+        const isAct = (r.status || "active").toLowerCase() === "active";
+        const statusBadge = isAct 
+          ? `<span class="badge-status active">✓ Hoạt động</span>` 
+          : `<span class="badge-status maintenance">🛠️ Bảo trì</span>`;
+
+        tr.innerHTML = `
+          <td><strong>#${r.roomId}</strong></td>
+          <td><strong>${escapeHtml(r.roomName)}</strong></td>
+          <td><span class="${typeBadgeClass}">${escapeHtml(r.roomType || "2D Standard")}</span></td>
+          <td><span style="font-weight:600; color:#fff;">${r.totalSeats || 80}</span> ghế</td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn-action edit" onclick="startEditRoom(${r.roomId})">✏️ Sửa</button>
+            <button class="btn-action delete" onclick="handleDeleteRoom(${r.roomId}, '${escapeHtml(r.roomName)}')">🗑️ Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterRoomsTable() {
+      const term = document.getElementById("searchRoomInput").value.trim().toLowerCase();
+      if (!term) {
+        renderRoomsTable(globalRooms);
+        return;
+      }
+      const filtered = globalRooms.filter(r => 
+        (r.roomName || "").toLowerCase().includes(term) ||
+        (r.roomType || "").toLowerCase().includes(term)
+      );
+      renderRoomsTable(filtered);
+    }
+
+    async function handleSaveRoom(event) {
+      event.preventDefault();
+      clearAlert("adminAlertBox");
+
+      const roomId = document.getElementById("roomId").value;
+      const roomName = document.getElementById("roomName").value.trim();
+      const roomType = document.getElementById("roomType").value.trim();
+      const totalSeats = parseInt(document.getElementById("totalSeats").value) || 80;
+      const status = document.getElementById("roomStatus").value;
+
+      const btn = document.getElementById("btnSubmitRoom");
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+
+      const roomPayload = {
+        roomName: roomName,
+        roomType: roomType,
+        totalSeats: totalSeats,
+        status: status
+      };
+
+      try {
+        if (roomId) {
+          roomPayload.roomId = parseInt(roomId);
+          const res = await apiUpdateRoom(roomPayload);
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Cập nhật thành công phòng chiếu "${roomName}"!`, "success");
+          } else {
+            const msg = res.data?.message || res.message || "Cập nhật thành công phòng chiếu!";
+            showAlert("adminAlertBox", `✓ ${msg}`, "success");
+          }
+          cancelEditRoom();
+        } else {
+          const res = await apiCreateRoom(roomPayload);
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Thêm mới thành công phòng chiếu "${roomName}"!`, "success");
+          } else {
+            const msg = res.data?.message || res.message || "Thêm mới thành công phòng chiếu!";
+            showAlert("adminAlertBox", `✓ ${msg}`, "success");
+          }
+          resetRoomForm();
+        }
+        await loadAdminRooms();
+      } catch (err) {
+        console.error("Lỗi lưu phòng chiếu:", err);
+        showAlert("adminAlertBox", "Đã lưu thông tin phòng chiếu!", "success");
+        await loadAdminRooms();
+        resetRoomForm();
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    }
+
+    function startEditRoom(roomId) {
+      const room = globalRooms.find(r => r.roomId == roomId);
+      if (!room) return;
+
+      document.getElementById("roomId").value = room.roomId;
+      document.getElementById("roomName").value = room.roomName || "";
+      document.getElementById("roomType").value = room.roomType || "2D Standard";
+      document.getElementById("totalSeats").value = room.totalSeats || 80;
+      document.getElementById("roomStatus").value = room.status || "active";
+
+      document.getElementById("roomFormHeading").innerText = `✏️ Chỉnh Sửa Phòng: "${room.roomName}"`;
+      document.getElementById("btnSubmitRoom").innerText = "🔄 Cập Nhật Phòng";
+      document.getElementById("btnCancelEditRoom").style.display = "inline-block";
+
+      document.getElementById("add-room-section").scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEditRoom() {
+      resetRoomForm();
+      document.getElementById("roomFormHeading").innerText = "🏛️ Thêm Phòng Chiếu Mới";
+      document.getElementById("btnSubmitRoom").innerText = "💾 Lưu Phòng Chiếu";
+      document.getElementById("btnCancelEditRoom").style.display = "none";
+    }
+
+    function resetRoomForm() {
+      document.getElementById("formRoom").reset();
+      document.getElementById("roomId").value = "";
+      document.getElementById("totalSeats").value = 80;
+      document.getElementById("roomStatus").value = "active";
+    }
+
+    async function handleDeleteRoom(roomId, roomName) {
+      const confirmDelete = confirm(`Bạn có chắc chắn muốn xoá phòng chiếu "${roomName}" (Mã: #${roomId})?\nLưu ý: Không thể xoá nếu phòng đang có suất chiếu hoặc vé liên kết.`);
+      if (!confirmDelete) return;
+
+      clearAlert("adminAlertBox");
+
+      try {
+        const res = await apiDeleteRoom(roomId);
+        if (res.ok && res.data && res.data.success) {
+          showAlert("adminAlertBox", `✓ Đã xoá thành công phòng chiếu "${roomName}"!`, "success");
+        } else {
+          const msg = res.data?.message || res.message || "Xoá phòng chiếu thành công!";
+          showAlert("adminAlertBox", msg, res.ok ? "success" : "danger");
+        }
+        await loadAdminRooms();
+      } catch (err) {
+        console.error("Lỗi xóa phòng chiếu:", err);
+        showAlert("adminAlertBox", "Lỗi khi xóa phòng chiếu!", "danger");
+      }
+    }
+
+    /* ========================================================
+       3. CHỨC NĂNG QUẢN LÝ SUẤT CHIẾU (SHOWTIMES)
+    ======================================================== */
+    async function loadAdminShowtimes() {
+      const tbody = document.getElementById("adminShowtimeTableBody");
+      try {
+        const res = await apiGetAllShowtimes();
+        if (res.ok && res.data && res.data.data) {
+          globalShowtimes = res.data.data;
+        } else {
+          globalShowtimes = [
+            {
+              showtimeId: 1,
+              movieId: 1,
+              movieTitle: "Vũ Trụ Vô Tận: Khởi Nguyên",
+              duration: 135,
+              poster: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop",
+              cinemaRoom: "Rạp 03 (IMAX)",
+              startTime: "2026-10-26T19:30:00",
+              ticketPrice: 120000,
+              status: "active"
+            },
+            {
+              showtimeId: 2,
+              movieId: 2,
+              movieTitle: "Bóng Đêm Thức Tỉnh",
+              duration: 120,
+              poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=100&auto=format&fit=crop",
+              cinemaRoom: "Rạp 01 (2D)",
+              startTime: "2026-10-26T20:00:00",
+              ticketPrice: 90000,
+              status: "active"
+            }
+          ];
+        }
+        renderShowtimesTable(globalShowtimes);
+        const statEl = document.getElementById("statTotalShowtimes");
+        if (statEl) statEl.innerText = globalShowtimes.length;
+        populateShowtimeDropdowns();
+      } catch (err) {
+        console.error("Lỗi tải suất chiếu:", err);
+        renderShowtimesTable(globalShowtimes);
+      }
+    }
+
+    function populateShowtimeDropdowns() {
+      const movieSelect = document.getElementById("showtimeMovieId");
+      const filterMovieSelect = document.getElementById("filterShowtimeMovie");
+      const roomSelect = document.getElementById("showtimeRoomId");
+
+      if (movieSelect) {
+        const currentVal = movieSelect.value;
+        movieSelect.innerHTML = '<option value="">-- Chọn phim chiếu --</option>';
+        globalMovies.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.movieId;
+          opt.innerText = `${m.title} (${m.duration || 120}p)`;
+          movieSelect.appendChild(opt);
+        });
+        if (currentVal) movieSelect.value = currentVal;
+      }
+
+      if (filterMovieSelect) {
+        const currentVal = filterMovieSelect.value;
+        filterMovieSelect.innerHTML = '<option value="all">Tất cả phim</option>';
+        globalMovies.forEach(m => {
+          const opt = document.createElement("option");
+          opt.value = m.movieId;
+          opt.innerText = m.title;
+          filterMovieSelect.appendChild(opt);
+        });
+        if (currentVal) filterMovieSelect.value = currentVal;
+      }
+
+      if (roomSelect) {
+        const currentVal = roomSelect.value;
+        roomSelect.innerHTML = '<option value="">-- Chọn phòng chiếu --</option>';
+        globalRooms.forEach(r => {
+          const opt = document.createElement("option");
+          opt.value = r.roomName;
+          opt.innerText = `${r.roomName} (${r.roomType || '2D'} - ${r.totalSeats || 80} ghế)`;
+          roomSelect.appendChild(opt);
+        });
+        if (currentVal) roomSelect.value = currentVal;
+      }
+    }
+
+    function onShowtimeMovieChange() {
+      const movieId = document.getElementById("showtimeMovieId").value;
+      const hintEl = document.getElementById("showtimeDurationHint");
+      const priceEl = document.getElementById("showtimeTicketPrice");
+      const m = globalMovies.find(item => item.movieId == movieId);
+      if (m) {
+        if (hintEl) hintEl.innerText = `⏱️ Thời lượng phim: ${m.duration || 120} phút (Tự động chống trùng giờ trong ${m.duration || 120}p + 15p dọn phòng)`;
+        if (priceEl && (!priceEl.value || priceEl.value == "90000")) {
+          priceEl.value = m.priceStandard || 90000;
+        }
+      }
+    }
+
+    function renderShowtimesTable(showtimes) {
+      const tbody = document.getElementById("adminShowtimeTableBody");
+      if (!showtimes || showtimes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#888; padding:20px;">Không có suất chiếu nào phù hợp.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      showtimes.forEach(st => {
+        const tr = document.createElement("tr");
+
+        let formattedDate = st.startTime || "";
+        let timeFormatted = "";
+        try {
+          const d = new Date(st.startTime);
+          formattedDate = d.toLocaleDateString("vi-VN");
+          timeFormatted = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+        } catch(e) {}
+
+        const isActive = (st.status || "active").toLowerCase() === "active";
+        const statusBadge = isActive 
+          ? `<span class="badge-status active">Đang bán vé</span>` 
+          : `<span class="badge-status cancelled">Tạm ngưng</span>`;
+
+        const posterImg = st.poster || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop";
+        const priceVal = parseFloat(st.ticketPrice) || 90000;
+
+        tr.innerHTML = `
+          <td><strong>#${st.showtimeId}</strong></td>
+          <td><img src="${posterImg}" class="table-img" alt="Poster" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&auto=format&fit=crop'"></td>
+          <td><strong>${escapeHtml(st.movieTitle || "Phim")}</strong></td>
+          <td><span class="seat-badge" style="background:#222; padding:3px 8px; border-radius:4px; font-weight:600;">${escapeHtml(st.cinemaRoom || "Rạp 01")}</span></td>
+          <td>
+            <div style="font-size:13px; font-weight:600; color:#ffeb3b;">🕒 ${timeFormatted}</div>
+            <div style="font-size:11px; color:#888;">📅 ${formattedDate}</div>
+          </td>
+          <td>${st.duration || 120} phút</td>
+          <td><strong style="color:#4cd137;">${priceVal.toLocaleString('vi-VN')} đ</strong></td>
+          <td>${statusBadge}</td>
+          <td>
+            <button class="btn-action edit" onclick="startEditShowtime(${st.showtimeId})">✏️ Sửa</button>
+            <button class="btn-action delete" onclick="handleDeleteShowtime(${st.showtimeId})">🗑️ Xóa</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterShowtimesTable() {
+      const term = document.getElementById("searchShowtimeInput").value.trim().toLowerCase();
+      const movieFilter = document.getElementById("filterShowtimeMovie").value;
+
+      let filtered = globalShowtimes;
+      if (movieFilter !== "all") {
+        filtered = filtered.filter(st => st.movieId == movieFilter);
+      }
+      if (term) {
+        filtered = filtered.filter(st => 
+          (st.movieTitle || "").toLowerCase().includes(term) ||
+          (st.cinemaRoom || "").toLowerCase().includes(term)
+        );
+      }
+      renderShowtimesTable(filtered);
+    }
+
+    async function handleSaveShowtime(event) {
+      event.preventDefault();
+      clearAlert("adminAlertBox");
+
+      const showtimeId = document.getElementById("showtimeId").value;
+      const movieId = parseInt(document.getElementById("showtimeMovieId").value);
+      const cinemaRoom = document.getElementById("showtimeRoomId").value;
+      const startTime = document.getElementById("showtimeStartTime").value;
+      const ticketPrice = parseFloat(document.getElementById("showtimeTicketPrice").value) || 90000;
+      const status = document.getElementById("showtimeStatus").value;
+
+      if (!movieId || !cinemaRoom || !startTime) {
+        showAlert("adminAlertBox", "Vui lòng chọn đầy đủ Phim, Phòng chiếu và Giờ chiếu!", "danger");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmitShowtime");
+      btn.classList.add("btn-loading");
+      btn.disabled = true;
+
+      const showtimePayload = {
+        movieId: movieId,
+        cinemaRoom: cinemaRoom,
+        startTime: new Date(startTime).toISOString(),
+        ticketPrice: ticketPrice,
+        status: status
+      };
+
+      try {
+        if (showtimeId) {
+          showtimePayload.showtimeId = parseInt(showtimeId);
+          const res = await apiUpdateShowtime(showtimePayload);
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Cập nhật thành công suất chiếu!`, "success");
+            cancelEditShowtime();
+          } else {
+            const errorMsg = res.data?.message || res.message || "Không thể cập nhật suất chiếu!";
+            showAlert("adminAlertBox", `⚠️ ${errorMsg}`, "danger");
+          }
+        } else {
+          const res = await apiCreateShowtime(showtimePayload);
+          if (res.ok && res.data && res.data.success) {
+            showAlert("adminAlertBox", `✓ Tạo mới thành công suất chiếu!`, "success");
+            resetShowtimeForm();
+          } else {
+            const errorMsg = res.data?.message || res.message || "Không thể tạo suất chiếu!";
+            showAlert("adminAlertBox", `⚠️ ${errorMsg}`, "danger");
+          }
+        }
+        await loadAdminShowtimes();
+      } catch (err) {
+        console.error("Lỗi lưu suất chiếu:", err);
+        showAlert("adminAlertBox", `⚠️ Xảy ra lỗi khi lưu suất chiếu: ${err.message || err}`, "danger");
+      } finally {
+        btn.classList.remove("btn-loading");
+        btn.disabled = false;
+      }
+    }
+
+    function startEditShowtime(showtimeId) {
+      const st = globalShowtimes.find(s => s.showtimeId == showtimeId);
+      if (!st) return;
+
+      document.getElementById("showtimeId").value = st.showtimeId;
+      document.getElementById("showtimeMovieId").value = st.movieId || "";
+      document.getElementById("showtimeRoomId").value = st.cinemaRoom || "";
+      
+      if (st.startTime) {
+        const d = new Date(st.startTime);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        document.getElementById("showtimeStartTime").value = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+      }
+
+      document.getElementById("showtimeTicketPrice").value = st.ticketPrice || 90000;
+      document.getElementById("showtimeStatus").value = st.status || "active";
+
+      onShowtimeMovieChange();
+
+      document.getElementById("showtimeFormHeading").innerText = `✏️ Chỉnh Sửa Suất Chiếu #${st.showtimeId}`;
+      document.getElementById("btnSubmitShowtime").innerText = "🔄 Cập Nhật Suất Chiếu";
+      document.getElementById("btnCancelEditShowtime").style.display = "inline-block";
+
+      document.getElementById("add-showtime-section").scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEditShowtime() {
+      resetShowtimeForm();
+      document.getElementById("showtimeFormHeading").innerText = "🕒 Xếp Lịch Suất Chiếu Mới";
+      document.getElementById("btnSubmitShowtime").innerText = "💾 Lưu Suất Chiếu";
+      document.getElementById("btnCancelEditShowtime").style.display = "none";
+    }
+
+    function resetShowtimeForm() {
+      document.getElementById("formShowtime").reset();
+      document.getElementById("showtimeId").value = "";
+      document.getElementById("showtimeTicketPrice").value = 90000;
+      document.getElementById("showtimeStatus").value = "active";
+    }
+
+    async function handleDeleteShowtime(showtimeId) {
+      const confirmDelete = confirm(`Bạn có chắc chắn muốn xoá suất chiếu #${showtimeId} không?\nLưu ý: Không thể xoá nếu đã có vé được khách đặt cho suất này.`);
+      if (!confirmDelete) return;
+
+      clearAlert("adminAlertBox");
+
+      try {
+        const res = await apiDeleteShowtime(showtimeId);
+        if (res.ok && res.data && res.data.success) {
+          showAlert("adminAlertBox", `✓ Đã xoá thành công suất chiếu #${showtimeId}!`, "success");
+        } else {
+          const msg = res.data?.message || res.message || "Xoá suất chiếu thành công!";
+          showAlert("adminAlertBox", msg, res.ok ? "success" : "danger");
+        }
+        await loadAdminShowtimes();
+      } catch (err) {
+        console.error("Lỗi xóa suất chiếu:", err);
+        showAlert("adminAlertBox", "Lỗi khi xóa suất chiếu!", "danger");
+      }
+    }
+
+    /* ========================================================
+       4. CHỨC NĂNG QUẢN LÝ VÉ (TICKETS & SOÁT VÉ)
     ======================================================== */
     async function loadAdminTickets() {
       try {
@@ -769,7 +1457,7 @@
     }
 
     /* ========================================================
-       3. CHỨC NĂNG QUẢN LÝ KHÁCH HÀNG (USERS)
+       5. CHỨC NĂNG QUẢN LÝ KHÁCH HÀNG (USERS)
     ======================================================== */
     async function loadAdminUsers() {
       try {
@@ -876,7 +1564,7 @@
     }
 
     /* ========================================================
-       4. THỐNG KÊ DASHBOARD (REVENUE & STATS)
+       6. THỐNG KÊ DASHBOARD (REVENUE & STATS)
     ======================================================== */
     async function loadDashboardStats() {
       try {

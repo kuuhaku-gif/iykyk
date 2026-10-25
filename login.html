@@ -56,11 +56,16 @@
   <script>
     // Nếu đã đăng nhập với quyền Admin thì tự động chuyển luôn sang trang admin
     document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectUrl = urlParams.get('redirect');
+
       if (isLoggedIn()) {
         const user = getCurrentUser();
         const role = (user?.role || user?.Role || "").trim().toLowerCase();
         if (role === "admin") {
-          window.location.href = "admin.html";
+          window.location.href = redirectUrl || "admin.html";
+        } else if (redirectUrl) {
+          window.location.href = redirectUrl;
         }
       }
     });
@@ -89,18 +94,22 @@
           // Lưu Token và Thông tin người dùng vào LocalStorage
           saveAuth(res.data.token, user);
 
+          // Kiểm tra URL redirect (ví dụ quay lại payment.html sau khi đăng nhập)
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectUrl = urlParams.get('redirect');
+
           // Kiểm tra quyền Admin (không phân biệt hoa/thường)
           const userRole = (user?.role || user?.Role || "").trim().toLowerCase();
 
           if (userRole === "admin") {
             showAlert("loginAlert", "Đăng nhập quyền Quản trị viên thành công! Đang chuyển đến trang Admin...", "success");
             setTimeout(() => {
-              window.location.href = "admin.html";
+              window.location.href = redirectUrl || "admin.html";
             }, 700);
           } else {
-            showAlert("loginAlert", "Đăng nhập thành công! Đang chuyển về trang chủ...", "success");
+            showAlert("loginAlert", "Đăng nhập thành công! Đang chuyển tiếp...", "success");
             setTimeout(() => {
-              window.location.href = "Trangchu.html";
+              window.location.href = redirectUrl || "Trangchu.html";
             }, 700);
           }
 

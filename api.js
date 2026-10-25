@@ -10,9 +10,7 @@ const CONFIG = {
   ACTIVE_URL: "http://localhost:5000/api"
 };
 
-/**
- * Hàm gửi request linh hoạt, tự động thử Gateway trước, nếu lỗi kết nối sẽ thử trực tiếp Backend
- */
+/** Hàm gửi request linh hoạt, tự động thử Gateway trước, nếu lỗi kết nối sẽ thử trực tiếp Backend*/
 async function apiRequest(endpoint, method = "GET", body = null, needAuth = false) {
   const headers = {
     "Content-Type": "application/json"
@@ -199,6 +197,40 @@ async function apiGetRevenueStats() {
 // 19. Lấy toàn bộ danh sách khách hàng
 async function apiGetAllUsers() {
   return await apiRequest("/user/get-all", "GET", null, true);
+}
+
+// 20. Quản lý Phòng Chiếu (Cinema Rooms)
+async function apiGetAllRooms() {
+  return await apiRequest("/cinemaroom/get-all", "GET");
+}
+
+async function apiCreateRoom(roomData) {
+  return await apiRequest("/cinemaroom/create", "POST", roomData, true);
+}
+
+async function apiUpdateRoom(roomData) {
+  return await apiRequest("/cinemaroom/update", "POST", roomData, true);
+}
+
+async function apiDeleteRoom(roomId) {
+  return await apiRequest(`/cinemaroom/delete/${roomId}`, "DELETE", null, true);
+}
+
+// 21. Quản lý Suất Chiếu (Showtimes)
+async function apiGetAllShowtimes() {
+  return await apiRequest("/showtime/get-all", "GET", null, true);
+}
+
+async function apiCreateShowtime(showtimeData) {
+  return await apiRequest("/showtime/create", "POST", showtimeData, true);
+}
+
+async function apiUpdateShowtime(showtimeData) {
+  return await apiRequest("/showtime/update", "POST", showtimeData, true);
+}
+
+async function apiDeleteShowtime(showtimeId) {
+  return await apiRequest(`/showtime/delete/${showtimeId}`, "DELETE", null, true);
 }
 
 /* ========================================================
